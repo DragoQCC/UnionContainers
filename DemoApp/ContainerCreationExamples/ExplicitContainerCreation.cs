@@ -177,7 +177,7 @@ public class ExplicitContainerCreation
     public static async Task AllowedTypesFuncUseExample()
     {
         string name = "Bob";
-        UnionContainer<string,int> container = await MethodToContainer<Func<object>,string,int>(() =>
+        UnionContainer<string,int> container = MethodToContainer<string,int>(() => 
         {
             if (name.EqualsCaseInsensitive("bob"))
             {

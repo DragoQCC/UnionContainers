@@ -13,6 +13,9 @@ It is not a pure copy of a discriminated union, but it is a close approximation 
         <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
         <Configurations>Debug;Release</Configurations>
         <Platforms>AnyCPU;x64</Platforms>
+        <PackageProjectUrl>https://github.com/DragoQCC/UnionContainers</PackageProjectUrl>
+        <PackageLicenseUrl>https://github.com/DragoQCC/UnionContainers/blob/main/LICENSE</PackageLicenseUrl>
+        <RepositoryUrl>https://github.com/DragoQCC/UnionContainers</RepositoryUrl>
     </PropertyGroup>
     <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
       <DebugSymbols>true</DebugSymbols>
