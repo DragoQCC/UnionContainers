@@ -1,0 +1,29 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <OutputType>Exe</OutputType>
+        <TargetFramework>net8.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <LangVersion>latest</LangVersion>
+        <Configurations>Debug;Release</Configurations>
+        <Platforms>AnyCPU;x64</Platforms>
+    </PropertyGroup>
+
+  <!--  <PropertyGroup>
+        <ReportAnalyzer>true</ReportAnalyzer>
+    </PropertyGroup>-->
+    
+    <ItemGroup>
+        <ProjectReference Include="..\UnionContainersShared\UnionContainers.Shared.csproj"/>
+      <ProjectReference Include="..\UnionContainersCore\UnionContainers.Core.csproj" />
+      <ProjectReference Include="..\UnionContainersAnalyzersAndSourceGen\UnionContainers.AnalyzersAndSourceGen.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
+    </ItemGroup>
+    
+    <ItemGroup>
+      <PackageReference Include="MethodTimer.Fody" Version="3.2.2" />
+      <PackageReference Include="Microsoft.Extensions.Hosting" Version="8.0.0" />
+      <PackageReference Include="Pastel" Version="5.1.0" />
+    </ItemGroup>
+  
+</Project>
