@@ -3,10 +3,10 @@
 It is not a pure copy of a discriminated union, but it is a close approximation with some extras mixed in to make working with this type as painless as possible in existing or new C# projects.
 
 The `UnionContainers` library uses Roslyn source generators & diagnostic analyzers to assist in the creation and usage of `UnionContainers`.
-This helps to ensure compile time checks are performed to minimize runtime errors. It also provides the ability to have type safe, strongly typed compile time code without the overhead of reflection or dynamic types.
+This helps to ensure compile time checks are performed to minimize runtime errors. It also provides the ability to have type-safe, strongly typed compile-time code without the overhead of reflection or dynamic types.
 
 ## Features & Benefits
-- **Type Safety**: The `UnionContainers` library provides type safety by using Roslyn diagnostic analyzers to prevent assignment of invalid types to `UnionContainers` & from `UnionContainers`.
+- **Type Safety**: The `UnionContainers` library provides type safety by using Roslyn diagnostic analyzers to prevent the assignment of invalid types to `UnionContainers` & from `UnionContainers`.
 - **Compile Time Checks**: The `UnionContainers` library provides several compile time checks to ensure that the `UnionContainers` are used correctly.
 - **Little Reflection**: The `UnionContainers` library only uses reflection when required (ex. match dynamic delegates to the container type), it uses generics to enforce strongly typed containers.
 - **Avoid Null Reference Exceptions**: The `UnionContainers` library helps to avoid null reference exceptions by providing a way to handle empty containers.
@@ -21,13 +21,21 @@ Interested in trying the library out? You can install it via NuGet Package Manag
 ```bash
 Install-Package UnionContainers
 ```
-Next add a using statement to the top of your file to use the library
+Next, add a using statement to the top of your file to use the library
 ```csharp
 using UnionContainer.Core.Common;
 using UnionContainer.Core.Helpers;
 using UnionContainer.Core.UnionContainers;
 using UnionContainers.Shared.Common;
 ```
+
+### Demo App 
+Test the Demo App and see various examples of the UnionContainers, Functional Methods, and Allowed Types Aspects.
+1. Git clone
+2. Build
+3. Run DemoApp
+4. Review demo app source code examples
+
 
 ## What is a UnionContainer? 
 A Union Container is a type that can be in one of four states: 
@@ -86,10 +94,62 @@ container is Empty
 Container has an exception: System.DivideByZeroException: Attempted to divide by zero.
 ```
 
+## Why UnionContainers? 
+The library provides the features mentioned above and showcased in the rest of the ReadME. 
+I created this library with the goal of having a result type that could contain results, errors, and exceptions, allow for returning the result item, ingest additional methods, and return results based on the results value. 
+
+It can be used in any situation where the return state is not guaranteed for example 
+1. Database Query
+2. Web APIs
+3. Non-user written methods that throw an exception (ex. HttpClient)
+4. Getting items from a list
+5. As an argument to avoid method overloads for slight variations in argument types (ex. ID as string, int, or GUID)
+6. Return types from user-written methods where more context and variation in return types is desired
+
+the following is an example of querying a LiteDB database for a type of item that may not exist in the database 
+```csharp
+public async Task<UnionContainer<IEnumerable<T>>> GetAllFromDatabaseAsync<T>()
+{
+    try
+    {
+        var container = new UnionContainer<IEnumerable<T>>();
+        var foundItems = await _database.GetCollection<T>().FindAllAsync();
+        if(foundItems != null && foundItems.Any())
+        {
+            return container.SetValue(foundItems);
+        }
+        return container.AddError($"No items of type {typeof(T)} found in database.");
+    }
+    catch (Exception e)
+    {
+        return UnionContainerFactory.CreateWithException<IEnumerable<T>>(e);
+    }
+}
+```
+This then allows the caller to inspect the states they care about and inspect any errors or exceptions in the database method added to the container.
+```csharp
+public async void Example()
+{
+    UnionContainer<IEnumerable<ExampleType>> databaseResultContainer = await GetAllFromDatabaseAsync<ExampleType>();
+    databaseResultContainer.IfErrorDo<string>(x => Console.WriteLine(x));
+    databaseResultContainer.IfExceptionDo(x => Console.WriteLine(x));
+    databaseResultContainer.IfEmptyDo(() => Console.WriteLine("No value set in container return type"));
+    databaseResultContainer.TryHandleResult(() =>
+    {
+        foreach (ExampleType exampleType in databaseResultContainer.TryGetValue())
+        {
+            Console.WriteLine(exampleType);
+        }
+    });
+}
+```
+
+
+
 ## Basic Usage
 
 ### Null Handling
-Containers will also gracefully handle null values and will be in an empty state if a null value is assigned to them.
+Containers will also gracefully handle null values and be empty if a null value is assigned to them.
 ```csharp
 UnionContainer<int> container = null;
 if (container.IsEmpty)
@@ -101,10 +161,10 @@ if (container.HasValue)
     Console.WriteLine($"Container has a value: {container.Value}");
 }
 ```
-the above will output `container is empty` as the container is null and therefore never left the empty state.
+the above will output `container is empty` as the container is null and, therefore, never left the empty state.
 
 ### Empty State
-The `Empty` state is a state that is set to struct that is meant to contain no values and acts as a replacement for null/void values.
+The `Empty` state is a state that is set to a struct that is meant to contain no values and acts as a replacement for null/void values.
 ```csharp
 [Serializable]
 [StructLayout(LayoutKind.Sequential, Size = 1)]
