@@ -11,9 +11,9 @@
     </PropertyGroup>
     
     <ItemGroup>
-        <ProjectReference Include="..\UnionContainersShared\UnionContainers.Shared.csproj"/>
-      <ProjectReference Include="..\UnionContainersCore\UnionContainers.csproj" />
-      <ProjectReference Include="..\UnionContainersAnalyzersAndSourceGen\UnionContainers.Analyzers.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
+        <ProjectReference Include="..\UnionContainers.Shared\UnionContainers.Shared.csproj"/>
+      <ProjectReference Include="..\UnionContainers.Core\UnionContainers.csproj" />
+      <ProjectReference Include="..\UnionContainers.Analyzers\UnionContainers.Analyzers.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
     </ItemGroup>
     
     <ItemGroup>

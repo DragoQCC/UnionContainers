@@ -125,7 +125,8 @@ public static class TESTING
         var container = new UnionContainer<int>();
         //correctly is prevented so state value cannot be set directly
         //container.State = UnionContainerState.Error;
-        container.Errors = new List<IError> {ClientErrors.ValidationFailure().SetMessage("This is a test error")};
+        //container.Errors = new List<IError> {ClientErrors.ValidationFailure().SetMessage("This is a test error")};
+        container.AddErrors(new IError[] {ClientErrors.ValidationFailure().SetMessage("This is a test error")});
         return container;
     }
     
@@ -172,7 +173,8 @@ public static class TESTING
                 UnionContainerState.Empty => () => PrintMessage("No errors"),
                 UnionContainerState.Error => () =>
                 {
-                    var myErrors = container.Errors; //I don't want this to be accessible
+                    //I don't want this to be accessible, fixed via explicit interface implementation
+                    //var myErrors = container.Errors; 
                     PrintMessage("Errors found");
                     container.GetErrors().ForEach(error =>
                     {

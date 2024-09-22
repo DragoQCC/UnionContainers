@@ -42,7 +42,7 @@
   </Target>
 
   <ItemGroup>
-    <ProjectReference Include="..\UnionContainersShared\UnionContainers.Shared.csproj" OutputItemType="Analyzer" />
+    <ProjectReference Include="..\UnionContainers.Shared\UnionContainers.Shared.csproj" OutputItemType="Analyzer" />
   </ItemGroup>
 
   <ItemGroup>

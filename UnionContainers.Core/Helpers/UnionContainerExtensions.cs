@@ -203,6 +203,36 @@ public static class UnionContainerExtensions
     public static void AddError<TContainer>(this ref TContainer container, Exception ex) where TContainer : struct, IUnionContainer
         => container.AddError(CustomErrors.Exception(ex));
     
+    public static void AddErrors<TContainer>(this ref TContainer container, params IError[] errors) where TContainer : struct, IUnionContainer
+        => container.AddErrors(errors);
+
+    public static void AddErrors<TContainer>(this ref TContainer container, params string[] messages)
+        where TContainer : struct, IUnionContainer
+    {
+        foreach (var message in messages)
+        {
+            container.AddError(message);
+        }
+    }
+
+    public static void AddErrors<TContainer, TError>(this ref TContainer container, params TError[] errors)
+        where TContainer : struct, IUnionContainer where TError : struct, IError
+    {
+        foreach (var error in errors)
+        {
+           container.AddError(error); 
+        }
+    }
+
+    public static void AddErrors<TContainer>(this ref TContainer container, params Exception[] exceptions)
+        where TContainer : struct, IUnionContainer
+    {
+        foreach (var e in exceptions)
+        {
+            container.AddError(e);
+        }
+    }
+    
     public static void AddError<TContainer>(this ref TContainer container, IError error) where TContainer : struct, IUnionContainer
         => container.AddError(error);
     

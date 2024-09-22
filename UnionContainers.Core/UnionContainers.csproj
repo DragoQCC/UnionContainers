@@ -31,9 +31,9 @@ It is not a pure copy of a discriminated union, but it is a close approximation 
     </ItemGroup>
     <!-- Project references -->
     <ItemGroup>
-      <ProjectReference Include="..\UnionContainersAnalyzersAndSourceGen\UnionContainers.Analyzers.csproj" ReferenceOutputAssembly="false" />
-      <None Include="..\UnionContainersAnalyzersAndSourceGen\bin\$(Configuration)\netstandard2.0\UnionContainers.AnalyzersAndSourceGen.dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
-      <ProjectReference Include="..\UnionContainersShared\UnionContainers.Shared.csproj" PrivateAssets="All" Pack="true" />
+      <ProjectReference Include="..\UnionContainers.Analyzers\UnionContainers.Analyzers.csproj" ReferenceOutputAssembly="false" />
+      <None Include="..\UnionContainers.Analyzers\bin\$(Configuration)\netstandard2.0\UnionContainers.Analyzers.dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
+      <ProjectReference Include="..\UnionContainers.Shared\UnionContainers.Shared.csproj" PrivateAssets="All" Pack="true" />
     </ItemGroup>
 
     
