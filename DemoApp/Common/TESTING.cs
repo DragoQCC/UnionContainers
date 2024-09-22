@@ -168,6 +168,10 @@ public static class TESTING
         {
             var container = TestMethod6("Hello World");
             //var container = TestMethod6("H"); //uncomment to test with errors
+            
+            
+            container.IfEmptyDo(() => PrintMessage("No errors or result found"));
+            
             (container.State switch
             {
                 UnionContainerState.Empty => () => PrintMessage("No errors"),
@@ -213,7 +217,8 @@ public static class TESTING
     {
         //have to use method so the internal modifier on Errors property is working
         container.GetErrors();
-        //var myErrors = container.Errors; // This is correctly not accessible, however the implementing types cant prevent access??
+        //var myErrors = container.Errors; // This is correctly not accessible, fixed with explicit interface implementation and internal modifier
+        
 
     }
     

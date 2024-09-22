@@ -109,7 +109,7 @@ public static class UnionContainerExtensions
     /// <param name="action"></param>
     /// <typeparam name="TContainer"></typeparam>
     /// <returns>The original container instance so method calls can be chained</returns>
-    public static TContainer IfEmptyDo<TContainer>(this TContainer container, Action action) where TContainer : struct, IUnionContainer
+    public static TContainer IfEmptyDo<TContainer>(this ref TContainer container, Action action) where TContainer : struct, IUnionContainer
     {
         try
         {
