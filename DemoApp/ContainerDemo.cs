@@ -1,11 +1,8 @@
-﻿using System.Security.Cryptography;
-using DemoApp.Common;
-using DemoApp.ContainerCreationExamples;
+﻿/*using DemoApp.ContainerCreationExamples;
 using DemoApp.ContainerResultMatchExamples;
-using MethodTimer;
-using UnionContainers.Core.Common;
-using UnionContainers.Core.Helpers;
-using UnionContainers.Core.UnionContainers;
+using UnionContainers.Containers.Standard;
+using UnionContainers.Helpers;
+
 using static DemoApp.Program;
 using static DemoApp.Common.ConsoleMessageHelpers;
 
@@ -28,12 +25,12 @@ public class ContainerDemo(UnionContainerConfiguration containerConfiguration)
         try
         {
             ContainerHelloWorldIntro();
-            Console.WriteLine();
+            /*Console.WriteLine();
             BasicMatchExample();
             Console.WriteLine();
             BasicNonContainerMatchExample();
             Console.WriteLine();
-            ContainerDefaultAsNullDemo(containerConfiguration);
+            ContainerDefaultAsNullDemo(containerConfiguration);#1#
             Console.WriteLine();
         }
         catch (Exception e)
@@ -46,7 +43,7 @@ public class ContainerDemo(UnionContainerConfiguration containerConfiguration)
         try
         {
             //Constructor example
-            var exampleContainer = new UnionContainer<string, int, Guid>(Guid.NewGuid());
+            //var exampleContainer = new UnionContainer<string, int, Guid>(Guid.NewGuid());
             ExplicitContainerCreation.NonUserMethodToContainer();
             Console.WriteLine();
             ExplicitContainerCreation.NonUserMethodComparision();
@@ -72,7 +69,7 @@ public class ContainerDemo(UnionContainerConfiguration containerConfiguration)
         
         Console.WriteLine("Example of a container being used to wrap unsafe methods such as divide by zero");
         var divideByZeroResuiult1 = ExplicitContainerCreation.DivideByZeroTestContainer();
-        divideByZeroResuiult1.TryHandleResult((int value) => Console.WriteLine("Result of divide by zero: " + value));
+        divideByZeroResuiult1.Match((int value) => Console.WriteLine("Result of divide by zero: " + value));
         divideByZeroResuiult1.IfExceptionDo(ex => Console.WriteLine("Exception occurred: " + ex.Message));
         try
         {
@@ -129,8 +126,8 @@ public class ContainerDemo(UnionContainerConfiguration containerConfiguration)
         {
             ResultMatch.DeconstructionMatch();
             ResultMatch.IsResultExamples();
-            UnionContainer<string> containerToPassOn = ResultMatch.TryGetValueUnknownContainer(new UnionContainer<string,int>(5));
-            ResultMatch.TryGetValueKnownContainer(containerToPassOn);
+            //UnionContainer<string> containerToPassOn = ResultMatch.TryGetValueUnknownContainer(new UnionContainer<string,int>(5));
+            //ResultMatch.TryGetValueKnownContainer(containerToPassOn);
             ResultMatch.HandleResultExamples();
             Console.WriteLine();
             ResultMatch.TryGetValueFallbacks();
@@ -163,11 +160,11 @@ public class ContainerDemo(UnionContainerConfiguration containerConfiguration)
     
     
     
-    [Time("Basic Union Container match example that errors")]
+    /*[Time("Basic Union Container match example that errors")]
     private void BasicMatchExample()
     {
         TryGetEmployeeByNameIdOrGuid("Bob Stevens")
-            .TryHandleResult((Employee resultItem) =>
+            .MatchResult((Employee resultItem) =>
             {
                 Console.WriteLine("Container has a result");
                 Console.WriteLine($"Employee found: {resultItem.Name}");
@@ -214,28 +211,28 @@ public class ContainerDemo(UnionContainerConfiguration containerConfiguration)
         {
             Console.WriteLine("Exception occurred: " + e.Message);
         }
-    }
+    }#1#
 
-    private static void ContainerDefaultAsNullDemo(UnionContainerConfiguration containerConfiguration)
+    /*private static void ContainerDefaultAsNullDemo(UnionContainerConfiguration containerConfiguration)
     {
         Console.WriteLine($"{Info()} Showcase of UnionContainerConfiguration.DefaultAsNull being set to {containerConfiguration.UnionContainerOptions.DefaultAsNull}");
-        UnionContainer<string,int> container2 = new();
+        UnionContainers.Containers.Standard.UnionContainer<string,int> container2 = new();
         Console.WriteLine($"{Info()} Setting Container Value to the default value of the type");
         if (containerConfiguration.UnionContainerOptions.DefaultAsNull)
         {
             container2.SetValue(0);
             Console.WriteLine($"{Info()} When Default is treated like null the container will not handle the result as it is the default value of the type");
-            container2.TryHandleResult((int value) => Console.WriteLine("Container value is: " + value)); //skipped
+            container2.MatchResult((int value) => Console.WriteLine("Container value is: " + value)); //skipped
         }
         else
         {
             container2.SetValue(0);
             Console.WriteLine($"{Info()} When Default is treated like a value the container will handle the result as it is not null");
-            container2.TryHandleResult((int value) => Console.WriteLine("Container value is: " + value)); // executes
+            container2.MatchResult((int value) => Console.WriteLine("Container value is: " + value)); // executes
         }
         container2.SetValue(5);
-        container2.TryHandleResult((int value) => Console.WriteLine("Container value is: " + value));
-    }
+        container2.MatchResult((int value) => Console.WriteLine("Container value is: " + value));
+    }#1#
 
     private static void ContainerHelloWorldIntro()
     {
@@ -248,16 +245,16 @@ public class ContainerDemo(UnionContainerConfiguration containerConfiguration)
         //Produces error UNCT001, a container cannot be assigned a type that is not in the container / a derived type
         Console.WriteLine($"{Error()} Uncomment the below line to see the build/design time error produced when trying to assign a value of a different type to the container");
         //container.SetValue(7.5);
-        Console.WriteLine($"{Info()} When working with a container the TryHandleResult method can be used to handle the result of the container");
+        Console.WriteLine($"{Info()} When working with a container the MatchResult method can be used to handle the result of the container");
         Console.WriteLine($"{Info()} TryHandleMethod supports handling the result of the container with a Action, Func, or Task, it also supports passing in methods to handle exceptions & fallback values when a Func or value returning Task is used");
         Console.WriteLine($"{Success()} In this example a simple Action/Lambda calling Console.WriteLine was passed in to handle the result of the container");
-        container.TryHandleResult((string value) => Console.WriteLine("\t The value of the container is: " + value));
+        container.Match((string value) => Console.WriteLine("\t The value of the container is: " + value));
         
         Console.WriteLine($"{Info()} On a single type container the TryGetValue method can be used to get the value of the container");
-        string? containerValue = container.TryGetValue();
-        Console.WriteLine($"Container value: {containerValue}");
+        //string? containerValue = container.TryGetValue();
+        //Console.WriteLine($"Container value: {containerValue}");
         Console.WriteLine();
         Console.WriteLine($"{Caution()} It is possible that the container does not hold a value which will cause the method to return null");
-        Console.WriteLine($"{Info()} It is safer to use the TryHandleResult method as it will ignore the result if it is null, meaning your passed in method will never receive a null value");
+        Console.WriteLine($"{Info()} It is safer to use the MatchResult method as it will ignore the result if it is null, meaning your passed in method will never receive a null value");
     }
-}
+}*/

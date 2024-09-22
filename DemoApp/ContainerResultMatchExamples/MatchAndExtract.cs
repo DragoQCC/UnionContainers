@@ -1,6 +1,7 @@
-﻿using DemoApp.Common;
-using UnionContainers.Core.Helpers;
-using UnionContainers.Core.UnionContainers;
+﻿/*using System;
+using DemoApp.Common;
+using UnionContainers.Containers.DefaultError;
+using UnionContainers.Helpers;
 using static DemoApp.Program;
 
 namespace DemoApp.ContainerResultMatchExamples;
@@ -17,7 +18,7 @@ public class MatchAndExtract
         UnionContainer<Employee,Manager> container = GetEmployeeOrManagerByNameOrId("Jane Doe");
         
         Console.WriteLine("Example of a container matching the correct type & returning a result for the testValue variable");
-        string containerExtractedName = container.TryHandleResult((Employee employee) =>
+        string containerExtractedName = container.MatchResult((Employee employee) =>
         {
             Console.WriteLine($"Found employee returning name: {employee.Name}");
             return employee.Name;
@@ -29,14 +30,14 @@ public class MatchAndExtract
         }, 
         "none").GetMatchedItemAs<string>()!;
         
-        string containerExtractedName3 = container.TryHandleResult((Employee employee) =>
+        string containerExtractedName3 = container.MatchResult((Employee employee) =>
         {
             Console.WriteLine($"Found employee returning name: {employee.Name}");
             return employee.Name;
         }, fallbackValue:"none").GetMatchedItemAs<string>()!;
         
         Console.WriteLine("Example of a container matching a different type, but having a fallback value set for the testValue2 variable");
-        int containerExtractSalary = container.TryHandleResult((Manager manager) =>
+        int containerExtractSalary = container.MatchResult((Manager manager) =>
         {
             Console.WriteLine($"Found employee returning salary: {manager.Salary}");
             return manager.Salary;
@@ -59,40 +60,40 @@ public class MatchAndExtract
         //Goal here is that we want to extract the name of the employee or manager & set that as the value of the container
         //Otherwise we just have an Empty container which is fine to ignore
         UnionContainer<string> nameContainer = container
-        .TryHandleResult((Employee employee) => employee.Name)
-        .TryHandleResult((Manager manager) => manager.Name)
+        .MatchResult((Employee employee) => employee.Name)
+        .MatchResult((Manager manager) => manager.Name)
         .GetMatchedItemAs<string>()!;
         
         
         UnionContainer<string> nameContainer2 = (string)container
-        .TryHandleResult((Manager manager) => manager.Name)
-        .TryHandleResult((Employee employee) => employee.Name)
+        .MatchResult((Manager manager) => manager.Name)
+        .MatchResult((Employee employee) => employee.Name)
         .GetMatchedItem()!;
        
         
         nameContainer
         .IfEmptyDo(() => Console.WriteLine("Name container is empty"))
-        .TryHandleResult(name => Console.WriteLine($"Name Container Value: {name}"));
+        .MatchResult(name => Console.WriteLine($"Name Container Value: {name}"));
         
         nameContainer2
         .IfEmptyDo(() => Console.WriteLine("Name container 2 is empty"))
-        .TryHandleResult(name => Console.WriteLine($"Name Container 2 Value: {name}"));
+        .MatchResult(name => Console.WriteLine($"Name Container 2 Value: {name}"));
     }
 
     public static void ContainerMultiHandleUniqueTypeExtraction()
     {
         UnionContainer<Employee,Manager> container = GetEmployeeOrManagerByNameOrId("Jane Stevens");
         container
-        .TryHandleResult((Employee employee) => employee.Name)
-        .TryHandleResult((Manager manager) => manager.Salary);
+        .MatchResult((Employee employee) => employee.Name)
+        .MatchResult((Manager manager) => manager.Salary);
 
         UnionContainer<string,int> nameOrSalaryContainer = new();
         nameOrSalaryContainer
         .SetValue(container.GetMatchedItemAs<string>())
         .SetValue(container.GetMatchedItemAs<int>());
         
-        nameOrSalaryContainer.TryHandleResult((int salary) => Console.WriteLine($"Manager Salary: {salary}"));
-        nameOrSalaryContainer.TryHandleResult((string name) => Console.WriteLine($"Employee Name: {name}"));
+        nameOrSalaryContainer.MatchResult((int salary) => Console.WriteLine($"Manager Salary: {salary}"));
+        nameOrSalaryContainer.MatchResult((string name) => Console.WriteLine($"Employee Name: {name}"));
         ExampleMethod();
     }
     
@@ -103,7 +104,7 @@ public class MatchAndExtract
         //Create a container
         UnionContainer<string, int> container = new UnionContainer<string, int>().SetValue(5);
         //this will print "The value is an int 5"
-        container.TryHandleResult(
+        container.MatchResult(
         (int value) => Console.WriteLine($"The value is an int {value}"),
         (string value) => Console.WriteLine($"The value is a string {value}"));
     }
@@ -117,7 +118,7 @@ public class MatchAndExtract
         Console.WriteLine($"The value is {number1}"); // prints 5
         
 
-        container.TryHandleResult(
+        container.MatchResult(
             (int value) =>
             {
                 Console.WriteLine($"The value is an int that when added to 5 equals {value + 5}");
@@ -128,4 +129,4 @@ public class MatchAndExtract
     }
 
    
-}
+}*/

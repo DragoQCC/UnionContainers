@@ -1,6 +1,7 @@
-﻿using System.Net;
+﻿/*using System;
+using System.Net;
 using DemoApp.Common;
-using UnionContainers.Core.UnionContainers;
+using UnionContainers.Containers.Standard;
 using static DemoApp.Program;
 
 namespace DemoApp.ContainerCreationExamples;
@@ -20,4 +21,4 @@ public class ImplicitContainerCreation
         Console.WriteLine("Implicit container creation example from object conversion");
         UnionContainer<string, int, HttpStatusCode> container = HttpStatusCode.OK;
     }
-}
+}*/

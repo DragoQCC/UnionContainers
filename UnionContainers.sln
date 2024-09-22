@@ -3,13 +3,17 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.9.34607.119
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UnionContainers.Core", "UnionContainersCore\UnionContainers.Core.csproj", "{FFA50010-81C4-4021-AB48-B17FCF947F9F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UnionContainers", "UnionContainers.Core\UnionContainers.csproj", "{FFA50010-81C4-4021-AB48-B17FCF947F9F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnionContainers.AnalyzersAndSourceGen", "UnionContainersAnalyzersAndSourceGen\UnionContainers.AnalyzersAndSourceGen.csproj", "{A40081C7-8A8D-4790-AA37-32DD0210720E}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnionContainers.Analyzers", "UnionContainers.Analyzers\UnionContainers.Analyzers.csproj", "{A40081C7-8A8D-4790-AA37-32DD0210720E}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DemoApp", "DemoApp\DemoApp.csproj", "{3938D76D-51EB-45E0-8AAA-6CD529109ADC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnionContainers.Shared", "UnionContainersShared\UnionContainers.Shared.csproj", "{8F301806-F5B7-4C12-82FD-B14A77986554}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnionContainers.Shared", "UnionContainers.Shared\UnionContainers.Shared.csproj", "{8F301806-F5B7-4C12-82FD-B14A77986554}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnionContainers.Tests.Integration", "UnionContainers.Tests.Integration\UnionContainers.Tests.Integration.csproj", "{C65478C2-C194-4585-A31D-A635005C1705}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnionContainers.Tests.Unit", "UnionContainers.Tests.Unit\UnionContainers.Tests.Unit.csproj", "{2B020157-D24B-4A8B-B1A0-C3F093F700EF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -42,6 +46,18 @@ Global
 		{8F301806-F5B7-4C12-82FD-B14A77986554}.Release|Any CPU.Build.0 = Release|Any CPU
 		{8F301806-F5B7-4C12-82FD-B14A77986554}.Release|x64.ActiveCfg = Release|x64
 		{8F301806-F5B7-4C12-82FD-B14A77986554}.Release|x64.Build.0 = Release|x64
+		{C65478C2-C194-4585-A31D-A635005C1705}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C65478C2-C194-4585-A31D-A635005C1705}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C65478C2-C194-4585-A31D-A635005C1705}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C65478C2-C194-4585-A31D-A635005C1705}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C65478C2-C194-4585-A31D-A635005C1705}.Release|x64.ActiveCfg = Release|Any CPU
+		{C65478C2-C194-4585-A31D-A635005C1705}.Release|x64.Build.0 = Release|Any CPU
+		{2B020157-D24B-4A8B-B1A0-C3F093F700EF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2B020157-D24B-4A8B-B1A0-C3F093F700EF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2B020157-D24B-4A8B-B1A0-C3F093F700EF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2B020157-D24B-4A8B-B1A0-C3F093F700EF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2B020157-D24B-4A8B-B1A0-C3F093F700EF}.Release|x64.ActiveCfg = Release|Any CPU
+		{2B020157-D24B-4A8B-B1A0-C3F093F700EF}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

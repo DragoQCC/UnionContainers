@@ -1,4 +1,6 @@
-﻿using System.Net;
+﻿/*using System;
+using System.Net;
+using System.Threading.Tasks;
 
 namespace DemoApp;
 
@@ -71,4 +73,4 @@ public class FunctionalDemo
         Console.WriteLine("--------------------------------------------------------------------------------");
         Console.WriteLine();
     }
-}
+}*/

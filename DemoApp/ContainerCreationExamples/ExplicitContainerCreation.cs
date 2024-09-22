@@ -1,11 +1,16 @@
-﻿using System.Net;
+﻿/*using System;
+using System.Net;
+using System.Net.Http;
 using System.Text.Json;
+using System.Threading;
+using System.Threading.Tasks;
 using UnionContainers.Shared.Common;
-using UnionContainers.Core.Helpers;
-using UnionContainers.Core.UnionContainers;
-using static UnionContainers.Core.Helpers.UnionContainerFactory;
+using UnionContainers.Helpers;
+using static UnionContainers.Helpers.UnionContainerFactory;
 using MethodTimer;
 using DemoApp.Common;
+using UnionContainers.Containers.DefaultError;
+using UnionContainers.Containers.Standard;
 using static DemoApp.Program;
 using static DemoApp.Common.ConsoleMessageHelpers;
 
@@ -24,7 +29,7 @@ public class ExplicitContainerCreation
     {
         // direct assignment but uses the implicit conversion operator for the argument
         Console.WriteLine("ContainerFromMethod Example");
-        UnionContainer<Employee, Manager> container = GetEmployeeOrManagerByNameOrId(targetManagerName); 
+        UnionContainers.Containers.Standard.UnionContainer<Employee, Manager> container = GetEmployeeOrManagerByNameOrId(targetManagerName); 
     }
 
 
@@ -42,7 +47,7 @@ public class ExplicitContainerCreation
 
 
         container.IfEmptyDo(() => Console.WriteLine("Container is empty"))
-            .TryHandleResult((HttpResponseMessage response) =>
+            .MatchResult((HttpResponseMessage response) =>
             {
                 Console.WriteLine("Container has a response: " + response);
                 if (response.StatusCode != HttpStatusCode.OK)
@@ -92,7 +97,7 @@ public class ExplicitContainerCreation
         
         container
         .IfEmptyDo(() => Console.WriteLine("Container is empty"))
-        .TryHandleResult((HttpResponseMessage response) =>
+        .MatchResult((HttpResponseMessage response) =>
         {
             Console.WriteLine("Container has a response: " + response);
             if (response.StatusCode != HttpStatusCode.OK)
@@ -123,7 +128,7 @@ public class ExplicitContainerCreation
         
         container
         .IfEmptyDo(() => Console.WriteLine("Container is empty"))
-        .TryHandleResult((HttpResponseMessage response) =>
+        .MatchResult((HttpResponseMessage response) =>
         {
             Console.WriteLine("Container has a response: " + response);
             if (response.StatusCode != HttpStatusCode.OK)
@@ -147,7 +152,7 @@ public class ExplicitContainerCreation
         var container = MethodToContainer<UnionContainer<HttpResponseMessage>,HttpResponseMessage>(() => TryConnectLocalhost("localhost", "http", 5005));
         
         container.IfEmptyDo(() => Console.WriteLine("Container is empty"))
-        .TryHandleResult((HttpResponseMessage result) =>
+        .MatchResult((HttpResponseMessage result) =>
         {
             Console.WriteLine("processing result");
             HttpStatusCode returnValue = GetConnectionResponseCode(result);
@@ -166,10 +171,10 @@ public class ExplicitContainerCreation
     {
         var container = MethodToContainer<UnionContainer<HttpResponseMessage>,HttpResponseMessage>(() => TryConnectLocalhost("localhost", "http", 5005));
         
-        container.TryConvertContainer<UnionContainer<int, string>>();
+        container.TryConvertContainer<UnionContainers.Containers.Standard.UnionContainer<int, string>>();
         
         container.IfEmptyDo(() => Console.WriteLine("Container is empty"))
-            .TryHandleResult((HttpResponseMessage result) =>Console.WriteLine("processing result"))
+            .MatchResult((HttpResponseMessage result) =>Console.WriteLine("processing result"))
             .IfErrorDo<HttpStatusCode>((errors) => Console.WriteLine($"Container has an error: \n\t {errors.ToCommaSeparatedString()}"))
             .IfExceptionDo((exception) => Console.WriteLine("Container has an exception: " + exception.Message));
     }
@@ -177,7 +182,7 @@ public class ExplicitContainerCreation
     public static async Task AllowedTypesFuncUseExample()
     {
         string name = "Bob";
-        UnionContainer<string,int> container = MethodToContainer<string,int>(() => 
+        UnionContainers.Containers.Standard.UnionContainer<string,int> container = MethodToContainer<string,int>(() => 
         {
             if (name.EqualsCaseInsensitive("bob"))
             {
@@ -192,7 +197,7 @@ public class ExplicitContainerCreation
         });
         
         container.IfEmptyDo(() => Console.WriteLine("Container is empty"))
-        .TryHandleResult((int result) =>
+        .MatchResult((int result) =>
         {
             Console.WriteLine("processing result " + result);
         })
@@ -202,10 +207,10 @@ public class ExplicitContainerCreation
     
     public static async Task UserTaskWrapperExample()
     {
-        var container = await MethodToContainer(async () => await TryConnectAsync("localhost", "http", 5005));
+        /*var container = await MethodToContainer(async () => await TryConnectAsync("localhost", "http", 5005));
         
         container.IfEmptyDo(() => Console.WriteLine("Container is empty"))
-        .TryHandleResult((HttpResponseMessage result) =>
+        .MatchResult((HttpResponseMessage result) =>
         {
             Console.WriteLine("processing result");
             HttpStatusCode returnValue = GetConnectionResponseCode(result);
@@ -215,8 +220,8 @@ public class ExplicitContainerCreation
                 container.AddError(returnValue);
             }
         })
-        .IfErrorDo<HttpStatusCode>((errors) => Console.WriteLine($"Container has an error: \n\t {errors.ToCommaSeparatedString()}"))
-        .IfExceptionDo((exception) => Console.WriteLine("Container has an exception: " + exception.Message));
+        .IfErrorDo<HttpStatusCode>((errors) => Console.WriteLine($"Container has an error: \n\t {errors}"))
+        .IfExceptionDo((exception) => Console.WriteLine("Container has an exception: " + exception.Message));#1#
     }
     
     public static HttpStatusCode GetConnectionResponseCode(HttpResponseMessage response)
@@ -227,7 +232,7 @@ public class ExplicitContainerCreation
 
     public static void JsonTest()
     {
-        Console.WriteLine($"{Info()} Json Serialization 6 union value container Example");
+        /*Console.WriteLine($"{Info()} Json Serialization 6 union value container Example");
         //create a container of all the job related types in the demo app and set its value state
         UnionContainer<Employee,NewHire,Manager,ManagerInTraining,HrPerson,HrPersonInTraining> bigContainer = new();
         bigContainer.SetValue(employee);
@@ -241,33 +246,38 @@ public class ExplicitContainerCreation
         //deserialize the json back into a container
         var bigContainer2 = JsonSerializer.Deserialize<UnionContainer<Employee,NewHire,Manager,ManagerInTraining,HrPerson,HrPersonInTraining>>(jsonContainer);
         Console.WriteLine($"{Info()} If at least one of the handlers matched the container values type the passed in method will be executed");
-        bigContainer2.TryHandleResult(
+        bigContainer2.MatchResult(
             (Employee result) => Console.WriteLine("Big container2 value: " + result),
             (NewHire result) => Console.WriteLine("Big container2 value: " + result),
             (Manager result) => Console.WriteLine("Big container2 value: " + result),
             (ManagerInTraining result) => Console.WriteLine("Big container2 value: " + result),
             (HrPerson result) => Console.WriteLine("Big container2 value: " + result),
             (HrPersonInTraining result) => Console.WriteLine("Big container2 value: " + result)
-        );
+        );#1#
         
         
         //Produces error UNCT009 for each invalid type in the handler list
         /*Console.WriteLine("Example of invalid handler types being used");
-        bigContainer2.TryHandleResult(
+        bigContainer2.MatchResult(
             (int result) => Console.WriteLine("Big container2 value: " + result),
             (string result) => Console.WriteLine("Big container2 value: " + result),
             (char result) => Console.WriteLine("Big container2 value: " + result),
             (bool result) => Console.WriteLine("Big container2 value: " + result),
             (DateTime result) => Console.WriteLine("Big container2 value: " + result),
             (List<string> result) => Console.WriteLine("Big container2 value: " + result)
-        );*/
+        );#1#
     }
 
     public static UnionContainer<int> DivideByZeroTestContainer()
     {
         UnionContainer<int> container = new UnionContainer<int>();
-        container =  MethodToContainer<int>(() => RandomExampleMethods.Divide(10,0));
+        container =  MethodToContainer(() => RandomExampleMethods.Divide(10,0));
         return container;
+    }
+
+    public static void Test()
+    {
+        var container = UnionContainerFactory.Create(10);
     }
     
     public static int DivideByZeroTest()
@@ -275,4 +285,4 @@ public class ExplicitContainerCreation
         int result = RandomExampleMethods.Divide(10, 0);
         return result;
     }
-}
+}*/

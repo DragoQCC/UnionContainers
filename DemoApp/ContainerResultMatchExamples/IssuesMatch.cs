@@ -1,7 +1,7 @@
-﻿using DemoApp.Common;
-using UnionContainers.Core.Common;
-using UnionContainers.Core.Helpers;
-using UnionContainers.Core.UnionContainers;
+﻿/*using System;
+using DemoApp.Common;
+using UnionContainers.Containers.DefaultError;
+using UnionContainers.Helpers;
 using UnionContainers.Shared.Common;
 using static DemoApp.Program;
 
@@ -35,7 +35,7 @@ public class IssuesMatch
         try
         {
             TryGetEmployeeByNameIdOrGuid("Bob Stevens")
-                .TryHandleResult((Employee resultItem) =>
+                .MatchResult((Employee resultItem) =>
                 {
                     Console.WriteLine("Container has a result");
                     Console.WriteLine($"Employee found: {resultItem.Name}");
@@ -152,4 +152,4 @@ public class IssuesMatch
         }
         return container;
     }
-}
+}*/

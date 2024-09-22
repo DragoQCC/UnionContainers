@@ -1,4 +1,6 @@
-﻿namespace DemoApp.TypeLimitingAttributeExamples;
+﻿using System;
+
+namespace DemoApp.TypeLimitingAttributeExamples;
 
 public class GenericClassUsageExamples
 {

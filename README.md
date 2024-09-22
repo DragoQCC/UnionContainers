@@ -228,7 +228,7 @@ public class ExplicitContainerCreation
        
         container
             .IfEmptyDo(() => Console.WriteLine("Container is empty"))
-            .TryHandleResult((HttpResponseMessage response) =>
+            .MatchResult((HttpResponseMessage response) =>
             {
                 Console.WriteLine("Container has a response: " + response);
                 if (response.StatusCode != HttpStatusCode.OK)
@@ -253,7 +253,7 @@ public class ExplicitContainerCreation
 
         container
             .IfEmptyDo(() => Console.WriteLine("Container is empty"))
-            .TryHandleResult((HttpResponseMessage result) =>
+            .MatchResult((HttpResponseMessage result) =>
             {
                 Console.WriteLine("processing result");
                 HttpStatusCode returnValue = GetConnectionResponseCode(result);
@@ -297,7 +297,7 @@ public static UnionContainer<Employee> TryGetEmployeeByNameOrId(UnionContainer<s
         container.AddErrorValue("No name or id provided");
     }
     Employee? employee = null;
-    nameOrId.TryHandleResult((string name) =>
+    nameOrId.MatchResult((string name) =>
     {
         Console.WriteLine($"Trying to get employee by name {name}: searching names");
         if(name == "Bob Stevens")
@@ -307,14 +307,14 @@ public static UnionContainer<Employee> TryGetEmployeeByNameOrId(UnionContainer<s
         employee = employees.FirstOrDefault(e => e.Name == name);
         employee.IfNullDo(() => container.AddErrorValue("No employee found with that name"));
     })
-    .TryHandleResult((int idNumber) =>
+    .MatchResult((int idNumber) =>
     {
         Console.WriteLine($"Trying to get employee by id {idNumber}: searching id values");
         employee = employees.FirstOrDefault(e => e.ID == new Guid(idNumber.ToString()));
         employee.IfNotNullDo((e) => container.SetValueState(e));
         employee.IfNullDo(() => container.AddErrorValue("No employee found with that id"));
     })
-    .TryHandleResult((Guid id) =>
+    .MatchResult((Guid id) =>
     {
         Console.WriteLine($"Trying to get employee by id {id}: searching id values");
         employee = employees.FirstOrDefault(e => e.ID == id);
@@ -334,7 +334,7 @@ when invoking code like what is above the caller does not have to pass in a Unio
 UnionContainer<Employee> container = new container = TryGetEmployeeByNameOrId("Jane Doe");
 if(container.HasResult())
 {
-    Container.TryHandleResult((Employee resultItem) =>
+    Container.MatchResult((Employee resultItem) =>
     {
        Console.WriteLine("Container has a result");
        Console.WriteLine($"Employee found: {resultItem.Name}");
@@ -504,8 +504,8 @@ public class ResultMatch
         ManagerInTraining? containerValueTwo;
         
         containerTwo.IfEmptyDo(() => Console.WriteLine("Container is empty"))
-            .TryHandleResult((Employee employee) => Console.WriteLine($"Container value is an employee \n\t{employee}"))
-            .TryHandleResult((ManagerInTraining manager) => Console.WriteLine($"Container value is a manager \n\t {manager}"));
+            .MatchResult((Employee employee) => Console.WriteLine($"Container value is an employee \n\t{employee}"))
+            .MatchResult((ManagerInTraining manager) => Console.WriteLine($"Container value is a manager \n\t {manager}"));
     }
     
     
@@ -538,19 +538,19 @@ public class ResultMatch
         });
         
         //Produces compile error UNCT007 because the container only supports 2 generics but was given 3 arguments
-        /*container.TryHandleResult(
+        /*container.MatchResult(
             (string responseBody) => Console.WriteLine("Got a response of: " + responseBody),
             (HttpStatusCode statuscode) => Console.WriteLine("Got a response status code of : " + statuscode),
             () => Console.WriteLine("Failed to get a response"));*/
 
-        container.TryHandleResult(
+        container.MatchResult(
             (string responseBody) => Console.WriteLine("Got a response of: " + responseBody),
             (HttpStatusCode statuscode) => Console.WriteLine("Got a response status code of : " + statuscode));
         
         UnionContainer<Employee, ManagerInTraining> containerTwo = employee;
         containerTwo.IfEmptyDo(() => Console.WriteLine("Container is empty"))
-            .TryHandleResult((Employee employee) => Console.WriteLine($"Container value is an employee \n\t{employee}"))
-            .TryHandleResult((ManagerInTraining manager) => Console.WriteLine($"Container value is a manager \n\t {manager}"));
+            .MatchResult((Employee employee) => Console.WriteLine($"Container value is an employee \n\t{employee}"))
+            .MatchResult((ManagerInTraining manager) => Console.WriteLine($"Container value is a manager \n\t {manager}"));
     }
 }
 ```
@@ -578,7 +578,7 @@ if(containerValue != null)
 
 //Better
 UnionContainer<string> container = "Hello World";
-container.TryHandleResult((string value) => Console.WriteLine($"Container value: {value}"));
+container.MatchResult((string value) => Console.WriteLine($"Container value: {value}"));
 ```
 
 However, if desired the `TryGetValue` method can be given an optional value/method to supply a backup return value in the case where the container is empty, in a null state, or contains an error.
@@ -604,15 +604,15 @@ Handle results lets you stay in the context of a container while providing a way
 This prevents any miscasts or null reference exceptions that could occur when trying to get the value out of the container and then perform actions on it.
 ```csharp
 UnionContainer<Employee,Manager> container = GetEmployeeOrManagerByNameOrId("Jane Doe");
-container.TryHandleResult(
+container.MatchResult(
     //executes if the value is an employee
     employee => Console.WriteLine($"Found employee \n info: {employee.Name} is a {employee.JobTitle} and makes {employee.Salary} as of {employee.StartDate}"),
     //executes if the value is a manager
     manager => Console.WriteLine($"Found manager \n info: {manager.Name} is a {manager.JobTitle} and makes {manager.Salary} as of {manager.StartDate}"));
 ```
-`TryHandleResult` also contains options for a catch handler method to be passed in `Func<Exception,T>? catchHandler` which can be used to handle exceptions that occur during the execution of the passed in methods.
+`MatchResult` also contains options for a catch handler method to be passed in `Func<Exception,T>? catchHandler` which can be used to handle exceptions that occur during the execution of the passed in methods.
 ```csharp
-container.TryHandleResult((Employee employee) =>
+container.MatchResult((Employee employee) =>
         {
             Console.WriteLine($"Found employee returning name: {employee.Name}");
             return employee.Name;
@@ -635,20 +635,20 @@ public static void ContainerSingleHandleValueExtract()
         UnionContainer<Employee,Manager> container = GetEmployeeOrManagerByNameOrId("Jane Doe");
         
         Console.WriteLine("Example of a container matching the correct type & returning a result for the testValue variable");
-        string containerExtractedName = container.TryHandleResult((Employee employee) =>
+        string containerExtractedName = container.MatchResult((Employee employee) =>
         {
             Console.WriteLine($"Found employee returning name: {employee.Name}");
             return employee.Name;
         }, fallbackValue:"none").GetMatchedItemAs<string>()!;
         
-        string containerExtractedName3 = container.TryHandleResult((Employee employee) =>
+        string containerExtractedName3 = container.MatchResult((Employee employee) =>
         {
             Console.WriteLine($"Found employee returning name: {employee.Name}");
             return employee.Name;
         }, fallbackValue:"none").GetMatchedItemAs<string>()!;
         
         Console.WriteLine("Example of a container matching a different type, but having a fallback value set for the testValue2 variable");
-        int containerExtractSalary = container.TryHandleResult((Manager manager) =>
+        int containerExtractSalary = container.MatchResult((Manager manager) =>
         {
             Console.WriteLine($"Found employee returning salary: {manager.Salary}");
             return manager.Salary;
@@ -666,47 +666,47 @@ public static void ContainerSingleHandleValueExtract()
         //Goal here is that we want to extract the name of the employee or manager & set that as the value of the container
         //Otherwise we just have an Empty container which is fine to ignore
         UnionContainer<string> nameContainer = container
-        .TryHandleResult((Employee employee) => employee.Name)
-        .TryHandleResult((Manager manager) => manager.Name)
+        .MatchResult((Employee employee) => employee.Name)
+        .MatchResult((Manager manager) => manager.Name)
         .GetMatchedItemAs<string>()!;
         
         
         UnionContainer<string> nameContainer2 = (string)container
-        .TryHandleResult((Employee employee) => employee.Name)
-        .TryHandleResult((Manager manager) => manager.Name)
+        .MatchResult((Employee employee) => employee.Name)
+        .MatchResult((Manager manager) => manager.Name)
         .GetMatchedItem()!;
        
         
         nameContainer
         .IfEmptyDo(() => Console.WriteLine("Name container is empty"))
-        .TryHandleResult(name => Console.WriteLine($"Name Container Value: {name}"));
+        .MatchResult(name => Console.WriteLine($"Name Container Value: {name}"));
         
         nameContainer2
         .IfEmptyDo(() => Console.WriteLine("Name container 2 is empty"))
-        .TryHandleResult(name => Console.WriteLine($"Name Container 2 Value: {name}"));
+        .MatchResult(name => Console.WriteLine($"Name Container 2 Value: {name}"));
     }
 
     public static void ContainerMultiHandleUniqueTypeExtraction()
     {
         UnionContainer<Employee,Manager> container = GetEmployeeOrManagerByNameOrId("Jane Stevens");
         container
-        .TryHandleResult((Employee employee) => employee.Name)
-        .TryHandleResult((Manager manager) => manager.Salary);
+        .MatchResult((Employee employee) => employee.Name)
+        .MatchResult((Manager manager) => manager.Salary);
 
         UnionContainer<string,int> nameOrSalaryContainer = new();
         nameOrSalaryContainer
         .SetValue(container.GetMatchedItemAs<string>())
         .SetValue(container.GetMatchedItemAs<int>());
         
-        nameOrSalaryContainer.TryHandleResult((int salary) => Console.WriteLine($"Manager Salary: {salary}"));
-        nameOrSalaryContainer.TryHandleResult((string name) => Console.WriteLine($"Employee Name: {name}"));
+        nameOrSalaryContainer.MatchResult((int salary) => Console.WriteLine($"Manager Salary: {salary}"));
+        nameOrSalaryContainer.MatchResult((string name) => Console.WriteLine($"Employee Name: {name}"));
         ExampleMethod();
     }
 ```
 
 looking at the above example we can see where a method was passed in to handle the result of the container and return the name of the employee stored in the container.
 ```csharp
-string containerExtractedName = container.TryHandleResult((Employee employee) =>
+string containerExtractedName = container.MatchResult((Employee employee) =>
 {
     Console.WriteLine($"Found employee returning name: {employee.Name}");
     return employee.Name;
@@ -730,7 +730,7 @@ public static void ExampleMethod()
     Console.WriteLine($"The value is {number1}"); // prints 5
     
 
-    container.TryHandleResult(
+    container.MatchResult(
         (int value) =>
         {
             Console.WriteLine($"The value is an int that when added to 5 equals {value + 5}");
@@ -739,7 +739,7 @@ public static void ExampleMethod()
     int number2 = container.GetMatchedItemAs<int>();
     Console.WriteLine($"The value is {number2}"); // prints 10
     
-    container.TryHandleResult(
+    container.MatchResult(
         (int value) =>
         {
             Console.WriteLine($"The value is an int that when added to 10 equals {value + 10}");
@@ -752,7 +752,7 @@ public static void ExampleMethod()
 Here we see that when TryGetValue is used the int value is extracted from the container and is equal to 5.
 When HandleResult with GetMatchedItem is used the container first ensures the value is an int, and then runs the supplied method adding 5 to it, 
 the int value the method returns is then extracted with the GetMatchedItemAs method and is equal to 10.
-Again since the value of the executed method is cleared after its extracted a new TryHandleResult method can be executed to handle the value in a different way, this time printing 15.
+Again since the value of the executed method is cleared after its extracted a new MatchResult method can be executed to handle the value in a different way, this time printing 15.
 
 
 #### All State matching
@@ -777,12 +777,12 @@ public class AllMatch
             .IfErrorDo<string>((errors) => Console.WriteLine($"Container three has an error \n error values: {errors.ToCommaSeparatedString()}"))
             .IfExceptionDo((exception) => Console.WriteLine("Container three has an exception: " + exception.Message))
             .ContinueWith(container)
-            .TryHandleResult((Employee employee) =>
+            .MatchResult((Employee employee) =>
             {
                 Console.WriteLine($"Found employee \n info: {employee.Name} is a {employee.JobTitle} and makes {employee.Salary} as of {employee.StartDate}"); 
             })
             .ContinueWith(container)
-            .TryHandleResult((Manager manager) =>
+            .MatchResult((Manager manager) =>
             {
                 Console.WriteLine($"Found manager \n info: {manager.Name} is a {manager.JobTitle} and makes {manager.Salary} as of {manager.StartDate}");
                 return manager.Name;
@@ -799,9 +799,9 @@ Currently, the `UnionContainers` library provides a few compile time checks to e
 - **UNCT004: Invalid Container Conversion** - The target container type must contain all the generic types of the source container type.
 - **UNCT005: Incompatible type assignment from TryGetValue** - Warns about potential type mismatches when assigning the result of TryGetValue to a variable.
 - **UNCT006: Invalid type usage** - Ensures that the used type is one of the allowed types specified by the AllowedTypesAttribute.
-- **UNCT007: Invalid HandleResult usage - Warning** - Detects when a chain of TryHandleResult calls might not handle all types from the original UnionContainer.
+- **UNCT007: Invalid HandleResult usage - Warning** - Detects when a chain of MatchResult calls might not handle all types from the original UnionContainer.
 - **UNCT008: Invalid type usage** - Ensures that the used type is not one of the denied types specified by the DeniedTypesAttribute.
-- **UNCT009: Invalid type usage** - Detects when TryHandleResult is invoked with incorrect types.
+- **UNCT009: Invalid type usage** - Detects when MatchResult is invoked with incorrect types.
 - **UNCT010** - Detects when a return type is not allowed Return types for MethodToContainer must be one of the containers specified types
 
 **Check the demo project for examples of how to use the `UnionContainers` library.**
@@ -1219,7 +1219,7 @@ public static void NonUserMethodToContainer()
 
 
     container.IfEmptyDo(() => Console.WriteLine("Container is empty"))
-        .TryHandleResult((HttpResponseMessage response) =>
+        .MatchResult((HttpResponseMessage response) =>
         {
             Console.WriteLine("Container has a response: " + response);
             if (response.StatusCode != HttpStatusCode.OK)

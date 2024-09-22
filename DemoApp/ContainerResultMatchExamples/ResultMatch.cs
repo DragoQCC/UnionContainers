@@ -1,9 +1,12 @@
-﻿using UnionContainers.Core.Helpers;
-using UnionContainers.Core.UnionContainers;
+﻿/*using System;
+using UnionContainers.Helpers;
 using System.Net;
+using System.Net.Http;
 using DemoApp.Common;
+using UnionContainers.Containers.Base;
+using UnionContainers.Containers.DefaultError;
 using static DemoApp.Program;
-using static UnionContainers.Core.Helpers.UnionContainerFactory;
+using static UnionContainers.Helpers.UnionContainerFactory;
 
 namespace DemoApp.ContainerResultMatchExamples;
 
@@ -31,7 +34,7 @@ public class ResultMatch
     /// <summary>
     /// The TryGetValue method can be used to get the value of the container
     /// </summary>
-    public static UnionContainer<string> TryGetValueUnknownContainer(IUnionContainer container)
+    public static UnionContainer<string> TryGetValueUnknownContainer(IUnionContainer<> container)
     {
         UnionContainer<string> resultContainer = new();
         try
@@ -135,13 +138,13 @@ public class ResultMatch
             return result.Content.ReadAsStringAsync().Result;
         });
 
-        container.TryHandleResult(
+        container.MatchResult(
             (string responseBody) => Console.WriteLine("Got a response of: " + responseBody),
             (HttpStatusCode statuscode) => Console.WriteLine("Got a response status code of : " + statuscode));
         
         UnionContainer<Employee, ManagerInTraining> containerTwo = employee;
         containerTwo.IfEmptyDo(() => Console.WriteLine("Container is empty"))
-            .TryHandleResult((Employee employee) => Console.WriteLine($"Container value is an employee \n\t{employee}"))
-            .TryHandleResult((ManagerInTraining manager) => Console.WriteLine($"Container value is a manager \n\t {manager}"));
+            .MatchResult((Employee employee) => Console.WriteLine($"Container value is an employee \n\t{employee}"))
+            .MatchResult((ManagerInTraining manager) => Console.WriteLine($"Container value is a manager \n\t {manager}"));
     }
-}
+}*/

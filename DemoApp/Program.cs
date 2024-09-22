@@ -1,18 +1,17 @@
-﻿using UnionContainers.Core.Common;
-using UnionContainers.Core.Helpers;
-using UnionContainers.Core.UnionContainers;
-using System.Diagnostics;
+﻿using UnionContainers.Helpers;
 using System.Net;
 using DemoApp.Common;
+using HelpfulTypesAndExtensions;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using UnionContainers.Containers.Standard;
+
 using static DemoApp.Common.ConsoleMessageHelpers;
-using MethodTimeLogger = DemoApp.Common.MethodTimeLogger;
 
 namespace DemoApp;
 
-class Program
+public class Program
 {
     // demo components
     public static Employee employee = new("John Doe",Guid.NewGuid(), "Manager", 100000, DateTime.UtcNow);
@@ -69,15 +68,17 @@ class Program
         
         //start the application
         await app.StartAsync();
-       
-        var containerDemo = new ContainerDemo(containerConfiguration);
+        
+        TESTING.TestMethod7();
+
+        /*var containerDemo = new ContainerDemo(containerConfiguration);
         var attributeDemo = new AttributeDemo();
         var functionalDemo = new FunctionalDemo();
-        
+
         await containerDemo.Run();
         await attributeDemo.Run();
         await functionalDemo.Run();
-        MethodTimeLogger.PrintLoggedMethodResults();
+        MethodTimeLogger.PrintLoggedMethodResults();*/
     }
 
 
@@ -136,13 +137,12 @@ class Program
         return nameOrId switch
         {
             ({ } name, _) => employees.FirstOrDefault(e => e.Name == name) ?? new UnionContainer<Employee>(),
-            (_, Guid id) => employees.FirstOrDefault(e => e.ID == id) ?? new UnionContainer<Employee>(),
-            _ => new UnionContainer<Employee>().SetException(new UnreachableException("This should not be reached"))
+            (_, Guid id) => employees.FirstOrDefault(e => e.ID == id) ?? new UnionContainer<Employee>()
         };
     }
     
 
-    public static UnionContainer<Employee> TryGetEmployeeByNameIdOrGuid(UnionContainer<string,int,Guid> nameOrId)
+    /*public static UnionContainer<Employee> TryGetEmployeeByNameIdOrGuid(UnionContainer<string,int,Guid> nameOrId)
     {
         var container = new UnionContainer<Employee>();
         //create 5 new employees
@@ -159,7 +159,7 @@ class Program
             container.AddError("No name or id provided");
         }
         Employee? employee = null;
-        nameOrId.TryHandleResult((string name) =>
+        nameOrId.MatchResult((string name) =>
         {
             Console.WriteLine($"Trying to get employee by name {name}: searching names");
             if(name == "Bob Stevens")
@@ -171,22 +171,22 @@ class Program
             Console.WriteLine("Finished searching for employee");
             employee.IfNullDo(() => container.AddError("No employee found with that name"));
         })
-        .TryHandleResult((int idNumber) =>
+        .MatchResult((int idNumber) =>
         {
             Console.WriteLine($"Trying to get employee by id number {idNumber}: searching id values");
             employee = employees.FirstOrDefault(e => e.ID == new Guid(idNumber.ToString()));
-            employee.IfNotNullDo((e) => container.SetValue(e));
+            employee.IfNotNullDo((e) => container);
             employee.IfNullDo(() => container.AddError("No employee found with that id"));
         })
-        .TryHandleResult((Guid id) =>
+        .MatchResult((Guid id) =>
         {
             Console.WriteLine($"Trying to get employee by id {id}: searching id values");
             employee = employees.FirstOrDefault(e => e.ID == id);
-            employee.IfNotNullDo((e) => container.SetValue(e));
+            employee.IfNotNullDo((e) => container);
             employee.IfNullDo(() => container.AddError("No employee found with that id"));
         });
         return container;
-    }
+    }*/
     
 
     public static Employee? TryGetEmployeeByNameOrIdWithoutContainers(string? name = null, int? id = null, Guid? guid= null)
@@ -275,8 +275,7 @@ class Program
         return nameOrId switch
         {
             ({ } name, _) => employees.FirstOrDefault(e => e.Name == name) ?? managers.FirstOrDefault(m => m.Name == name) ?? new UnionContainer<Employee,Manager>(),
-            (_, Guid id) => employees.FirstOrDefault(e => e.ID == id) ?? managers.FirstOrDefault(m =>m.ID == id) ?? new UnionContainer<Employee,Manager>(),
-            _ => new UnionContainer<Employee,Manager>().SetException(new UnreachableException("This should not be reached"))
+            (_, Guid id) => employees.FirstOrDefault(e => e.ID == id) ?? managers.FirstOrDefault(m =>m.ID == id) ?? new UnionContainer<Employee,Manager>()
         };
     }
 

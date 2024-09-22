@@ -1,0 +1,21 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+    
+    <PropertyGroup>
+        <TargetFramework>netstandard2.0</TargetFramework>
+        <LangVersion>12</LangVersion>
+        <Nullable>enable</Nullable>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Configurations>Debug;Release</Configurations>
+        <Platforms>AnyCPU;x64</Platforms>
+    </PropertyGroup>
+    
+    <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+      <DocumentationFile>bin\Release\UnionContainers.Shared.xml</DocumentationFile>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <InternalsVisibleTo Include="UnionContainers;UnionContainers.AnalyzersAndSourceGen" />
+    </ItemGroup>
+    
+
+</Project>

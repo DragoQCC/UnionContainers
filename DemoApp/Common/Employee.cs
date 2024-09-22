@@ -1,4 +1,7 @@
-﻿namespace DemoApp.Common;
+﻿using System;
+using System.Collections.Generic;
+
+namespace DemoApp.Common;
 
 public interface IEmployee
 {

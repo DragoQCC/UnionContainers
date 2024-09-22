@@ -1,5 +1,8 @@
-﻿using System.Net;
-using UnionContainers.Core.Helpers;
+﻿/*using System;
+using System.Collections.Generic;
+using System.Net;
+using System.Threading.Tasks;
+using UnionContainers.Helpers;
 using UnionContainers.Shared.Common;
 using static DemoApp.Program;
 
@@ -75,10 +78,10 @@ public class FunctionalExtensionsDemo
             .CheckIf(n => n.HasValue())
             .ContinueWith(name)
             .CheckIf(n => n == "Bob")
-            .ThenDo(name, n => Console.WriteLine("Name is Bob"), n => Console.WriteLine($"Name is not Bob its {n}"))
+            .ThenDo(n => Console.WriteLine("Name is Bob"), n => Console.WriteLine($"Name is not Bob its {n}"))
             .ContinueWith(name)
             .CheckIf(n => n == "Bob")
             .ThenDo(() => Console.WriteLine("Name is Bob"), () => Console.WriteLine($"Name is not Bob its {name}"));
     }
     
-}
+}*/

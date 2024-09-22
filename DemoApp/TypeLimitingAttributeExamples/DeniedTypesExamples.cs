@@ -1,6 +1,7 @@
-﻿using DemoApp.Common;
-using UnionContainers.Core.Common;
-using UnionContainers.Core.UnionContainers;
+﻿/*using System;
+using DemoApp.Common;
+using UnionContainers.Containers.DefaultError;
+using UnionContainers.Helpers;
 using UnionContainers.Shared.Common;
 
 namespace DemoApp.TypeLimitingAttributeExamples;
@@ -39,11 +40,11 @@ public class DeniedTypesExamples
         bool shortCircuit = false;
         UnionContainer<IEmployee> _empOfMonthContainer = Program.TryGetEmployeeOfTheMonth(name);
 
-        _empOfMonthContainer.TryHandleResult((Employee employee) =>
+        _empOfMonthContainer.MatchResult((Employee employee) =>
         {
             Console.WriteLine("Sorry, normal employees is not eligible for employee of the month.");
             shortCircuit = true;
-        }).TryHandleResult((Manager manager) =>
+        }).MatchResult((Manager manager) =>
         {
             Console.WriteLine("Sorry, management is not eligible for employee of the month.");
             shortCircuit = true;
@@ -51,7 +52,7 @@ public class DeniedTypesExamples
         
         if (shortCircuit is false)
         {
-            var hrPersonResult = _empOfMonthContainer.TryHandleResult((HrPerson hrPerson) =>
+            var hrPersonResult = _empOfMonthContainer.MatchResult((HrPerson hrPerson) =>
             {
                 Console.WriteLine("Congratulations to the HR team!");
                 Console.WriteLine($"Employee of the month is {hrPerson.Name}");
@@ -131,4 +132,4 @@ public class DeniedTypesExamples
         Console.WriteLine("Showcase where the denied type is not used and the method is called successfully");
         _customNumberAddition.Add(number3, number4);
     }
-}
+}*/

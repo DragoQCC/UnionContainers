@@ -1,4 +1,6 @@
-﻿namespace DemoApp.TypeLimitingAttributeExamples;
+﻿/*using System;
+
+namespace DemoApp.TypeLimitingAttributeExamples;
 using static DemoApp.Program;
 
 public class DeniedTypesUsageExamples
@@ -44,4 +46,4 @@ public class DeniedTypesUsageExamples
         //Errors with UNCT008
         //_typesExamples.TestArgument(hrPerson);
     }
-}
+}*/

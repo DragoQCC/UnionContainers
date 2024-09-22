@@ -1,6 +1,7 @@
-﻿using DemoApp.Common;
-using UnionContainers.Core.Common;
-using UnionContainers.Core.UnionContainers;
+﻿/*using System;
+using DemoApp.Common;
+using UnionContainers.Containers.DefaultError;
+using UnionContainers.Helpers;
 using UnionContainers.Shared.Common;
 
 namespace DemoApp.TypeLimitingAttributeExamples;
@@ -37,7 +38,7 @@ public class AllowedTypesExamples
     {
         UnionContainer<IEmployee> _empOfMonthContainer = Program.TryGetEmployeeOfTheMonth(name);
 
-        var employeeResult = _empOfMonthContainer.TryHandleResult((Employee employee) =>
+        var employeeResult = _empOfMonthContainer.MatchResult((Employee employee) =>
         {
             Console.WriteLine($"Employee of the month is {employee.Name}");
             Console.WriteLine("Thanks for all the hard work!");
@@ -47,7 +48,7 @@ public class AllowedTypesExamples
         {
             return employeeResult;
         }
-        var managerResult = _empOfMonthContainer.TryHandleResult((Manager manager) =>
+        var managerResult = _empOfMonthContainer.MatchResult((Manager manager) =>
         {
             Console.WriteLine("Congratulations to the management team!");
             Console.WriteLine($"Employee of the month is {manager.Name}");
@@ -57,7 +58,7 @@ public class AllowedTypesExamples
         {
             return managerResult;
         }
-        var hrPersonResult = _empOfMonthContainer.TryHandleResult((HrPerson hrPerson) =>
+        var hrPersonResult = _empOfMonthContainer.MatchResult((HrPerson hrPerson) =>
         {
             Console.WriteLine("Sorry, HR is not eligible for employee of the month.");
             return Empty.Nothing;
@@ -108,4 +109,4 @@ public class AllowedTypesExamples
         Console.WriteLine($"Validation failed");
         return value;
     }
-}
+}*/
