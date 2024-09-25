@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 
-namespace UnionContainers.Helpers;
+namespace UnionContainers;
 
 public sealed record ContainerCreationLogging(bool Log, LogLevel LogLevel);
 public sealed record ContainerConversionLogging(bool Log, LogLevel LogLevel);

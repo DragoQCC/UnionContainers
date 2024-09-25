@@ -1,12 +1,7 @@
-﻿using System;
-using System.Runtime.CompilerServices;
-using System.Threading.Tasks;
-using UnionContainers.Containers.Base;
-using UnionContainers.Containers.Standard;
-using UnionContainers.Errors;
-using UnionContainers.Shared.Common;
+﻿using System.Runtime.CompilerServices;
+using HelpfulTypesAndExtensions;
 
-namespace UnionContainers.Helpers;
+namespace UnionContainers;
 
 public partial class UnionContainerFactory
 {
@@ -15,14 +10,14 @@ public partial class UnionContainerFactory
         => new TContainer();
 
 
-    public static TContainer Create<TContainer,TValue>(IError error) where TContainer : IUnionContainer, new()
+    public static TContainer Create<TContainer,TValue>(IError error) where TContainer : struct, IUnionContainer
     {
         TContainer container = new();
         container.AddError(error);
         return container;
     }
     
-    public static TContainer Create<TContainer,TValue>(Exception exception) where TContainer : IUnionContainer, new()
+    public static TContainer Create<TContainer,TValue>(Exception exception) where TContainer : struct, IUnionContainer
     {
         TContainer container = new();
         container.AddError(CustomErrors.Exception(exception));

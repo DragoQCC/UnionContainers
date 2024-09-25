@@ -1,26 +1,32 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Runtime.CompilerServices;
-using UnionContainers.Errors;
+﻿using System.Runtime.CompilerServices;
+using HelpfulTypesAndExtensions;
 
-namespace UnionContainers.Containers.Base;
+namespace UnionContainers;
 
 public interface IUnionContainer
 {
-    public UnionContainerState State { get; init; }
+    public UnionContainerState State { get; internal set; }
     internal List<IError>? Errors { get; set; }
     
     
-    public void AddError(IError error)
+    /*public void AddError(IError error)
     {
         Errors ??= [];
         Errors.Add(error);
-    }
+        if(State != UnionContainerState.Error)
+        {
+            State = UnionContainerState.Error;
+        }
+    }*/
     
     public void AddErrors(params IError[] errors)
     {
         Errors ??= [];
         Errors.AddRange(errors);
+        if(State != UnionContainerState.Error)
+        {
+            State = UnionContainerState.Error;
+        }
     }
     
     public bool HasErrors() => Errors?.Count > 0;
@@ -66,6 +72,11 @@ public interface IUnionContainer
                 defaultAction?.Invoke();
             }
         }
+    }
+    
+    internal void SetState(UnionContainerState state)
+    {
+        State = state;
     }
     
 }

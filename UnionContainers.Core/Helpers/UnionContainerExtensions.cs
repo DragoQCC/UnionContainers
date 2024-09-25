@@ -1,11 +1,8 @@
 ﻿using System.Runtime.CompilerServices;
 using HelpfulTypesAndExtensions;
 using Microsoft.Extensions.Logging;
-using UnionContainers.Containers.Base;
-using UnionContainers.Containers.Standard;
-using UnionContainers.Errors;
 
-namespace UnionContainers.Helpers;
+namespace UnionContainers;
 
 public static class UnionContainerExtensions
 {
@@ -94,6 +91,9 @@ public static class UnionContainerExtensions
     /// <returns></returns>
     public static bool HasResult<TContainer>(this TContainer container) where TContainer : struct, IUnionContainer
         => container.State is UnionContainerState.Result;
+    
+    public static UnionContainerState GetState<TContainer>(this TContainer container) where TContainer : IUnionContainer //struct, IUnionContainer
+        => container.State;
     
     #endregion
     
@@ -192,16 +192,30 @@ public static class UnionContainerExtensions
             UnionContainerState.Error => container.GetErrors<CustomErrors.ExceptionWrapperError>().FirstOrDefault().exception.ReturnIf(x => x.IsNotDefault()),
             _ => null
         };
+
     
+    
+    
+    public static void AddError<TContainer>(this ref TContainer container, IError error) where TContainer : struct, IUnionContainer
+    {
+        container.Errors ??= [];
+        container.Errors.Add(error);
+        if(container.State != UnionContainerState.Error)
+        {
+            container.State = UnionContainerState.Error;
+        }
+    }
+    
+    public static void AddError<TContainer,TError>(this ref TContainer container, TError error) where TContainer : struct, IUnionContainer where TError : IError
+     => container.AddError((IError)error);
     
     public static void AddError<TContainer>(this ref TContainer container, string message) where TContainer : struct, IUnionContainer
         => container.AddError(CustomErrors.Generic(message));
     
-    public static void AddError<TContainer,TError>(this ref TContainer container, TError error) where TContainer : struct, IUnionContainer where TError : struct, IError
-        => container.AddError(error);
-    
     public static void AddError<TContainer>(this ref TContainer container, Exception ex) where TContainer : struct, IUnionContainer
         => container.AddError(CustomErrors.Exception(ex));
+    
+   
     
     public static void AddErrors<TContainer>(this ref TContainer container, params IError[] errors) where TContainer : struct, IUnionContainer
         => container.AddErrors(errors);
@@ -233,10 +247,9 @@ public static class UnionContainerExtensions
         }
     }
     
-    public static void AddError<TContainer>(this ref TContainer container, IError error) where TContainer : struct, IUnionContainer
-        => container.AddError(error);
     
-    public static List<IError> GetErrors<TContainer>(this ref TContainer container) where TContainer : struct, IUnionContainer
+    
+    public static List<IError> GetErrors<TContainer>(this  TContainer container) where TContainer : IUnionContainer//struct, IUnionContainer
         => container.GetErrors();
     
     public static List<TError> GetErrors<TError>(this IUnionContainer container)  where TError : struct, IError

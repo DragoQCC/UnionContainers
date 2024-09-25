@@ -1,12 +1,10 @@
-﻿using UnionContainers.Helpers;
-using System.Net;
+﻿using System.Net;
 using DemoApp.Common;
 using HelpfulTypesAndExtensions;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using UnionContainers.Containers.Standard;
-
+using UnionContainers;
 using static DemoApp.Common.ConsoleMessageHelpers;
 
 namespace DemoApp;

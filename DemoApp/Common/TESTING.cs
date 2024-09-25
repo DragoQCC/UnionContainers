@@ -1,10 +1,6 @@
 ﻿using System.Runtime.InteropServices;
-using UnionContainers.Containers.Base;
-using UnionContainers.Containers.Standard;
-using UnionContainers.Errors;
-using UnionContainers.Helpers;
 using HelpfulTypesAndExtensions;
-using HelpfulTypesAndExtensions.BaseClasses;
+using UnionContainers;
 
 
 namespace DemoApp.Common;
@@ -17,7 +13,7 @@ public static class TESTING
     public static void TestMethod()
     {
         var container = new UnionContainer<int>();
-        container.AddError(ClientErrors.ValidationFailure().SetMessage("This is a test error"));
+        container.AddError(ClientErrors.ValidationFailure("This is a test error"));
 
         var genericContainerErrors = container.GetErrors();
         
@@ -83,7 +79,7 @@ public static class TESTING
         if (input.IsEmpty())
         {
             TGuid guid = new();
-            return new(ClientErrors.ValidationFailure().SetMessage("Input cannot be empty"));
+            return new(ClientErrors.ValidationFailure("Input cannot be empty"));
         }
 
         return UnionContainer<int>.Result(1);
@@ -93,7 +89,7 @@ public static class TESTING
     {
         if (input.IsEmpty())
         {
-            return new(ClientErrors.ValidationFailure().SetMessage("Input cannot be empty"));
+            return new(ClientErrors.ValidationFailure("Input cannot be empty"));
         }
         try
         {
@@ -126,7 +122,7 @@ public static class TESTING
         //correctly is prevented so state value cannot be set directly
         //container.State = UnionContainerState.Error;
         //container.Errors = new List<IError> {ClientErrors.ValidationFailure().SetMessage("This is a test error")};
-        container.AddErrors(new IError[] {ClientErrors.ValidationFailure().SetMessage("This is a test error")});
+        container.AddErrors(new IError[] {ClientErrors.ValidationFailure("This is a test error")});
         return container;
     }
     
@@ -157,7 +153,13 @@ public static class TESTING
         if (errors.Count > 0)
         {
             Console.WriteLine($"Test Method 6 finished with {errors.Count} errors");
-            return errors;
+            //return errors;
+            var returnContainer = new UnionContainer<Employee>();
+            foreach (var error in errors)
+            {
+              returnContainer.AddError(error.GetMessage());
+            }
+            return returnContainer;
         }
         return new Employee(name, Guid.NewGuid(), "Employee Title", 1000, DateTime.Now);
     }
@@ -166,13 +168,13 @@ public static class TESTING
     {
         try
         {
-            var container = TestMethod6("Hello World");
-            //var container = TestMethod6("H"); //uncomment to test with errors
+            //var container = TestMethod6("Hello World");
+            var container = TestMethod6("H"); //uncomment to test with errors
             
             
-            container.IfEmptyDo(() => PrintMessage("No errors or result found"));
+            //container.IfEmptyDo(() => PrintMessage("No errors or result found"));
             
-            (container.State switch
+            (container.GetState() switch
             {
                 UnionContainerState.Empty => () => PrintMessage("No errors"),
                 UnionContainerState.Error => () =>
@@ -192,12 +194,12 @@ public static class TESTING
                         }
                     });
                 },
-                UnionContainerState.Result => () =>
+                /*UnionContainerState.Result => () =>
                 {
                     PrintMessage("Result found");
                     //var example = container.ResultValue; //I don't want this to be accessible, maybe fixed with explicit interface implementation?
                     PrintMessage($"Employee Name : {container.Match(e => e.Name)}");
-                },
+                },*/
                 _ => new Action(() => Console.WriteLine("Unknown state"))
             })();
         }

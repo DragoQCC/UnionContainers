@@ -1,15 +1,18 @@
-﻿using System;
-using UnionContainers.Containers.Base;
-using UnionContainers.Errors;
+﻿using HelpfulTypesAndExtensions;
 
-namespace UnionContainers.Containers.Standard;
+namespace UnionContainers;
 
 public record struct UnionContainer<T1,T2> : IUnionResultContainer<ValueTuple<T1,T2>>
 {
     
+    
+    internal UnionContainerState State { get; set; }
     /// <inheritdoc />
-    public UnionContainerState State { get; init; }
-
+    UnionContainerState IUnionContainer.State
+    {
+        get => State;
+        set => State = value;
+    }
 
     /// <inheritdoc />
     public Exception? ExceptionValue { get; set; }

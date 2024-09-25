@@ -1,4 +1,4 @@
-﻿namespace UnionContainers.Containers.Standard;
+﻿namespace UnionContainers;
 
 /*public record UnionContainer<T1,T2,T3> : UnionContainerBase<UnionContainer<T1,T2,T3>>, IUnionContainer<UnionContainer<T1,T2,T3>>
 {

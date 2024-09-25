@@ -1,4 +1,4 @@
-namespace UnionContainers.Containers.Base;
+namespace UnionContainers;
 
 public enum UnionContainerState
 {

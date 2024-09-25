@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace UnionContainers.Shared.Common;
+﻿namespace UnionContainers.Shared.Common;
 
 /// <summary>
 /// Opposite of the <see cref="AllowedTypesAttribute"/> this attribute will deny the types that can be used for a field, property, parameter, or return value <br/>

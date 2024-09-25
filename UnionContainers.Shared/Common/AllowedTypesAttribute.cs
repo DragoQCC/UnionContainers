@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace UnionContainers.Shared.Common;
+﻿namespace UnionContainers.Shared.Common;
 
 
 /// <summary>
