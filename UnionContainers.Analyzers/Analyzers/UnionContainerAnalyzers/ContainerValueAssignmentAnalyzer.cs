@@ -14,10 +14,13 @@ public class UnionContainerCreateValidationAnalyzer : DiagnosticAnalyzer
     private const string Category = "Usage";
 
     private static readonly LocalizableString Title = "Invalid argument type for UnionContainer creation or value setting";
-    private static readonly LocalizableString MessageFormat = "The type '{0}' is not a valid argument type for {1}. The argument must be one of the specified generic types or an UnionContainer of the same type.";
+
+    private static readonly LocalizableString MessageFormat =
+        "The type '{0}' is not a valid argument type for {1}. The argument must be one of the specified generic types or an UnionContainer of the same type.";
+
     private static readonly LocalizableString Description = "Detects when CreateWithValue or SetValueState is given an invalid type.";
 
-    private static readonly DiagnosticDescriptor Rule = new DiagnosticDescriptor(DiagnosticId, Title, MessageFormat, Category, DiagnosticSeverity.Error, isEnabledByDefault: true, description: Description);
+    private static readonly DiagnosticDescriptor Rule = new(DiagnosticId, Title, MessageFormat, Category, DiagnosticSeverity.Error, true, Description);
 
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(Rule);
 
@@ -32,29 +35,34 @@ public class UnionContainerCreateValidationAnalyzer : DiagnosticAnalyzer
     private void AnalyzeInvocationExpression(SyntaxNodeAnalysisContext context)
     {
         var invocationExpressionSyntax = (InvocationExpressionSyntax)context.Node;
-        if (invocationExpressionSyntax.Expression is not MemberAccessExpressionSyntax memberAccessExpressionSyntax || memberAccessExpressionSyntax.Name.Identifier.Text != "SetValue")
+        if (invocationExpressionSyntax.Expression is not MemberAccessExpressionSyntax memberAccessExpressionSyntax
+            || memberAccessExpressionSyntax.Name.Identifier.Text != "SetValue")
         {
             return;
         }
-        var symbolInfo = context.SemanticModel.GetSymbolInfo(invocationExpressionSyntax);
+
+        SymbolInfo symbolInfo = context.SemanticModel.GetSymbolInfo(invocationExpressionSyntax);
 
         if (symbolInfo.Symbol is not IMethodSymbol methodSymbol)
         {
             return;
         }
-        var UnionContainerType = GetUnionContainerType(context.SemanticModel, invocationExpressionSyntax);
+
+        INamedTypeSymbol? UnionContainerType = GetUnionContainerType(context.SemanticModel, invocationExpressionSyntax);
 
         if (UnionContainerType == null)
         {
             return;
         }
-        var argumentType = context.SemanticModel.GetTypeInfo(invocationExpressionSyntax.ArgumentList.Arguments[0].Expression).Type;
+
+        ITypeSymbol? argumentType = context.SemanticModel.GetTypeInfo(invocationExpressionSyntax.ArgumentList.Arguments[0].Expression).Type;
 
         if (IsValidArgumentType(argumentType, UnionContainerType))
         {
             return;
         }
-        var methodName = memberAccessExpressionSyntax.Name.Identifier.Text;
+
+        string methodName = memberAccessExpressionSyntax.Name.Identifier.Text;
         var diagnostic = Diagnostic.Create(Rule, invocationExpressionSyntax.GetLocation(), argumentType?.ToDisplayString(), $"{UnionContainerType.ToDisplayString()}.{methodName}");
 
         context.ReportDiagnostic(diagnostic);
@@ -69,28 +77,32 @@ public class UnionContainerCreateValidationAnalyzer : DiagnosticAnalyzer
             return;
         }
 
-        if (invocationExpressionSyntax.Expression is not MemberAccessExpressionSyntax memberAccessExpressionSyntax || memberAccessExpressionSyntax.Name.Identifier.Text != "CreateWithValue")
+        if (invocationExpressionSyntax.Expression is not MemberAccessExpressionSyntax memberAccessExpressionSyntax
+            || memberAccessExpressionSyntax.Name.Identifier.Text != "CreateWithValue")
         {
             return;
         }
-        var leftSymbol = context.SemanticModel.GetSymbolInfo(assignmentExpressionSyntax.Left).Symbol;
+
+        ISymbol? leftSymbol = context.SemanticModel.GetSymbolInfo(assignmentExpressionSyntax.Left).Symbol;
 
         if (leftSymbol?.GetTypeSymbol() is not INamedTypeSymbol UnionContainerType || !UnionContainerType.Name.StartsWith("UnionContainer"))
         {
             return;
         }
-        var argumentType = context.SemanticModel.GetTypeInfo(invocationExpressionSyntax.ArgumentList.Arguments[0].Expression).Type;
+
+        ITypeSymbol? argumentType = context.SemanticModel.GetTypeInfo(invocationExpressionSyntax.ArgumentList.Arguments[0].Expression).Type;
 
         if (IsValidArgumentType(argumentType, UnionContainerType))
         {
             return;
         }
-        var methodName = memberAccessExpressionSyntax.Name.Identifier.Text;
+
+        string methodName = memberAccessExpressionSyntax.Name.Identifier.Text;
         var diagnostic = Diagnostic.Create(Rule, invocationExpressionSyntax.GetLocation(), argumentType.ToDisplayString(), $"{UnionContainerType.ToDisplayString()}.{methodName}");
 
         context.ReportDiagnostic(diagnostic);
     }
-    
+
     private INamedTypeSymbol? GetUnionContainerType(SemanticModel semanticModel, InvocationExpressionSyntax invocationExpressionSyntax)
     {
         if (invocationExpressionSyntax.Expression is not MemberAccessExpressionSyntax memberAccessExpressionSyntax)
@@ -105,40 +117,43 @@ public class UnionContainerCreateValidationAnalyzer : DiagnosticAnalyzer
 
         return null;
     }
-    
+
     private bool IsValidArgumentType(ITypeSymbol? argumentType, INamedTypeSymbol? UnionContainerType)
     {
         if (argumentType == null || UnionContainerType == null)
         {
             return false;
         }
+
         if (argumentType.Name.StartsWith("UnionContainer") && SymbolEqualityComparer.Default.Equals(argumentType, UnionContainerType))
         {
             // The argument is an UnionContainer of the same type, so it's valid
             return true;
         }
-        else if (UnionContainerType.TypeArguments.Any(t => IsAssignableTo(argumentType, t)))
+
+        if (UnionContainerType.TypeArguments.Any(t => IsAssignableTo(argumentType, t)))
         {
             // The argument is one of the generic type parameters or a derived type, so it's valid
             return true;
         }
+
         return false;
     }
 
-    private bool IsAssignableTo(ITypeSymbol? typeSymbol, ITypeSymbol? targetType)
-    {
-        return typeSymbol != null && targetType != null &&
-               (SymbolEqualityComparer.Default.Equals(typeSymbol, targetType) ||
-                typeSymbol.AllInterfaces.Any(i => SymbolEqualityComparer.Default.Equals(i, targetType)) ||
-                IsAssignableTo(typeSymbol.BaseType, targetType));
-    }
+    private bool IsAssignableTo
+        (ITypeSymbol? typeSymbol, ITypeSymbol? targetType)
+        => typeSymbol != null
+            && targetType != null
+            && (SymbolEqualityComparer.Default.Equals
+                    (typeSymbol, targetType)
+                || typeSymbol.AllInterfaces.Any(i => SymbolEqualityComparer.Default.Equals(i, targetType))
+                || IsAssignableTo(typeSymbol.BaseType, targetType));
 }
 
 public static class SymbolExtensions
 {
     public static ITypeSymbol? GetTypeSymbol(this ISymbol symbol)
-    {
-        return symbol switch
+        => symbol switch
         {
             ILocalSymbol localSymbol => localSymbol.Type,
             IParameterSymbol parameterSymbol => parameterSymbol.Type,
@@ -146,5 +161,4 @@ public static class SymbolExtensions
             IFieldSymbol fieldSymbol => fieldSymbol.Type,
             _ => null
         };
-    }
 }

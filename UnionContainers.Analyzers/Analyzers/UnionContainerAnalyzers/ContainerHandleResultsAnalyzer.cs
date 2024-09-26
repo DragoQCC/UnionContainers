@@ -16,13 +16,13 @@ public class HandleResultAnalyzer : DiagnosticAnalyzer
     private static readonly LocalizableString Title = "Invalid MatchResult usage";
     private static readonly LocalizableString MessageFormat = "The number of actions passed to MatchResult does not match the number of generic type parameters of the UnionContainer, this may result in un matched types not being handled.";
     private static readonly LocalizableString Description = "Detects when MatchResult is invoked with an incorrect number of actions.";
-    
+
     private const string DiagnosticId2 = "UNCT009";
     private const string Category2 = "Usage";
     private static readonly LocalizableString Title2 = "Invalid MatchResult usage";
     private static readonly LocalizableString MessageFormat2 = "The Types {0} passed to MatchResult do not match the generic type parameters of the UnionContainer {1}", PassedTypes, ContainerTypes;
     private static readonly LocalizableString Description2 = "Detects when MatchResult is invoked with incorrect types";
-    
+
     private static readonly DiagnosticDescriptor Rule = new DiagnosticDescriptor(DiagnosticId, Title, MessageFormat, Category, DiagnosticSeverity.Warning, isEnabledByDefault: true, description: Description);
     private static readonly DiagnosticDescriptor Rule2 = new DiagnosticDescriptor(DiagnosticId2, Title2, MessageFormat2, Category2, DiagnosticSeverity.Error, isEnabledByDefault: true, description: Description2);
 
@@ -49,14 +49,14 @@ public class HandleResultAnalyzer : DiagnosticAnalyzer
         {
             return;
         }
-    
+
         var actionArguments = invocationExpressionSyntax.ArgumentList.Arguments;
 
         if (actionArguments.Count == 0)
         {
             return;
         }
-    
+
         int matchingActionCount = 0;
         foreach (var argument in actionArguments)
         {
@@ -99,7 +99,7 @@ public class HandleResultAnalyzer : DiagnosticAnalyzer
             context.ReportDiagnostic(diagnostic);
         }
     }
-    
+
     private bool IsAssignableTo(ITypeSymbol? typeSymbol, ITypeSymbol? targetType)
     {
         return typeSymbol != null && targetType != null &&
@@ -107,7 +107,7 @@ public class HandleResultAnalyzer : DiagnosticAnalyzer
                 typeSymbol.AllInterfaces.Any(i => SymbolEqualityComparer.Default.Equals(i, targetType)) ||
                 IsAssignableTo(typeSymbol.BaseType, targetType));
     }
-    
+
     private bool IsExceptionType(ITypeSymbol typeSymbol)
     {
         return typeSymbol != null && (typeSymbol.Name == "Exception" || (typeSymbol.BaseType != null && IsExceptionType(typeSymbol.BaseType)));
@@ -119,18 +119,18 @@ public class HandleResultAnalyzer : DiagnosticAnalyzer
 {
     private const string DiagnosticId = "UNCT007";
     private const string Category = "Usage";
+
+    private const string DiagnosticId2 = "UNCT009";
+    private const string Category2 = "Usage";
     private static readonly LocalizableString Title = "Potential unhandled types in MatchResult chain";
     private static readonly LocalizableString MessageFormat = "The MatchResult chain may not handle all types from the UnionContainer. Consider adding handlers for: {0}";
     private static readonly LocalizableString Description = "Detects when a chain of MatchResult calls might not handle all types from the original UnionContainer.";
-    
-    private const string DiagnosticId2 = "UNCT009";
-    private const string Category2 = "Usage";
     private static readonly LocalizableString Title2 = "Invalid MatchResult usage";
     private static readonly LocalizableString MessageFormat2 = "The Type {0} passed to MatchResult does not match any of the generic type parameters of the UnionContainer {1}";
     private static readonly LocalizableString Description2 = "Detects when MatchResult is invoked with incorrect types";
-    
-    private static readonly DiagnosticDescriptor Rule = new DiagnosticDescriptor(DiagnosticId, Title, MessageFormat, Category, DiagnosticSeverity.Info, isEnabledByDefault: true, description: Description);
-    private static readonly DiagnosticDescriptor Rule2 = new DiagnosticDescriptor(DiagnosticId2, Title2, MessageFormat2, Category2, DiagnosticSeverity.Error, isEnabledByDefault: true, description: Description2);
+
+    private static readonly DiagnosticDescriptor Rule = new(DiagnosticId, Title, MessageFormat, Category, DiagnosticSeverity.Info, true, Description);
+    private static readonly DiagnosticDescriptor Rule2 = new(DiagnosticId2, Title2, MessageFormat2, Category2, DiagnosticSeverity.Error, true, Description2);
 
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(Rule, Rule2);
 
@@ -149,7 +149,7 @@ public class HandleResultAnalyzer : DiagnosticAnalyzer
             return;
         }
 
-        var (containerType, chainStart) = FindOriginalContainerTypeAndChainStart(context, invocationExpressionSyntax);
+        (var containerType, InvocationExpressionSyntax chainStart) = FindOriginalContainerTypeAndChainStart(context, invocationExpressionSyntax);
         if (containerType == null || !containerType.TypeArguments.Any())
         {
             return;
@@ -158,7 +158,7 @@ public class HandleResultAnalyzer : DiagnosticAnalyzer
         var handledTypes = new HashSet<ITypeSymbol>(SymbolEqualityComparer.Default);
         AnalyzeMatchResultChainRecursive(context, chainStart, containerType, handledTypes);
 
-        var unhandledTypes = containerType.TypeArguments.Where(t => !handledTypes.Contains(t)).ToList();
+        List<ITypeSymbol> unhandledTypes = containerType.TypeArguments.Where(t => !handledTypes.Contains(t)).ToList();
         if (unhandledTypes.Any())
         {
             var diagnostic = Diagnostic.Create(Rule, chainStart.GetLocation(), string.Join(", ", unhandledTypes.Select(t => t.Name)));
@@ -166,23 +166,24 @@ public class HandleResultAnalyzer : DiagnosticAnalyzer
         }
     }
 
-    private void AnalyzeMatchResultChainRecursive(SyntaxNodeAnalysisContext context, InvocationExpressionSyntax invocation, INamedTypeSymbol containerType, HashSet<ITypeSymbol> handledTypes)
+    private void AnalyzeMatchResultChainRecursive
+        (SyntaxNodeAnalysisContext context, InvocationExpressionSyntax invocation, INamedTypeSymbol containerType, HashSet<ITypeSymbol> handledTypes)
     {
-        foreach (var argument in invocation.ArgumentList.Arguments)
+        foreach (ArgumentSyntax argument in invocation.ArgumentList.Arguments)
         {
             if (argument.Expression is not LambdaExpressionSyntax lambda)
             {
                 continue;
             }
 
-            var parameterSymbol = GetLambdaParameterSymbol(context, lambda);
+            IParameterSymbol? parameterSymbol = GetLambdaParameterSymbol(context, lambda);
             if (parameterSymbol == null)
             {
                 continue;
             }
 
-            var parameterType = parameterSymbol.Type;
-            var matchedType = containerType.TypeArguments.FirstOrDefault(t => IsAssignableTo(parameterType, t));
+            ITypeSymbol parameterType = parameterSymbol.Type;
+            ITypeSymbol? matchedType = containerType.TypeArguments.FirstOrDefault(t => IsAssignableTo(parameterType, t));
             if (matchedType != null)
             {
                 handledTypes.Add(matchedType);
@@ -195,9 +196,9 @@ public class HandleResultAnalyzer : DiagnosticAnalyzer
         }
 
         // Check for next MatchResult call in the chain
-        if (invocation.Parent is MemberAccessExpressionSyntax nextMemberAccess &&
-            nextMemberAccess.Parent is InvocationExpressionSyntax nextInvocation &&
-            nextMemberAccess.Name.Identifier.Text == "MatchResult")
+        if (invocation.Parent is MemberAccessExpressionSyntax nextMemberAccess
+            && nextMemberAccess.Parent is InvocationExpressionSyntax nextInvocation
+            && nextMemberAccess.Name.Identifier.Text == "MatchResult")
         {
             AnalyzeMatchResultChainRecursive(context, nextInvocation, containerType, handledTypes);
         }
@@ -205,7 +206,7 @@ public class HandleResultAnalyzer : DiagnosticAnalyzer
 
     private (INamedTypeSymbol, InvocationExpressionSyntax) FindOriginalContainerTypeAndChainStart(SyntaxNodeAnalysisContext context, InvocationExpressionSyntax invocation)
     {
-        var currentNode = invocation;
+        InvocationExpressionSyntax currentNode = invocation;
         INamedTypeSymbol containerType = null;
         InvocationExpressionSyntax chainStart = invocation;
 
@@ -213,7 +214,7 @@ public class HandleResultAnalyzer : DiagnosticAnalyzer
         {
             if (currentNode.Expression is MemberAccessExpressionSyntax memberAccess)
             {
-                var typeInfo = context.SemanticModel.GetTypeInfo(memberAccess.Expression);
+                TypeInfo typeInfo = context.SemanticModel.GetTypeInfo(memberAccess.Expression);
                 if (typeInfo.Type is INamedTypeSymbol namedType && namedType.Name == "UnionContainer")
                 {
                     containerType = namedType;
@@ -243,26 +244,27 @@ public class HandleResultAnalyzer : DiagnosticAnalyzer
     {
         if (lambda is SimpleLambdaExpressionSyntax simpleLambda)
         {
-            return context.SemanticModel.GetDeclaredSymbol(simpleLambda.Parameter) as IParameterSymbol;
+            return context.SemanticModel.GetDeclaredSymbol(simpleLambda.Parameter);
         }
-        else if (lambda is ParenthesizedLambdaExpressionSyntax parenthesizedLambda)
+
+        if (lambda is ParenthesizedLambdaExpressionSyntax parenthesizedLambda)
         {
-            return context.SemanticModel.GetDeclaredSymbol(parenthesizedLambda.ParameterList.Parameters.FirstOrDefault()) as IParameterSymbol;
+            return context.SemanticModel.GetDeclaredSymbol(parenthesizedLambda.ParameterList.Parameters.FirstOrDefault());
         }
+
         return null;
     }
 
-    private bool IsAssignableTo(ITypeSymbol typeSymbol, ITypeSymbol targetType)
-    {
-        return typeSymbol != null && targetType != null &&
-               (SymbolEqualityComparer.Default.Equals(typeSymbol, targetType) ||
-                typeSymbol.AllInterfaces.Any(i => SymbolEqualityComparer.Default.Equals(i, targetType)) ||
-                IsAssignableTo(typeSymbol.BaseType, targetType));
-    }
+    private bool IsAssignableTo
+        (ITypeSymbol typeSymbol, ITypeSymbol targetType)
+        => typeSymbol != null
+            && targetType != null
+            && (SymbolEqualityComparer.Default.Equals
+                    (typeSymbol, targetType)
+                || typeSymbol.AllInterfaces.Any(i => SymbolEqualityComparer.Default.Equals(i, targetType))
+                || IsAssignableTo(typeSymbol.BaseType, targetType));
 
-    private bool IsExceptionType(ITypeSymbol typeSymbol)
-    {
-        return typeSymbol != null && (typeSymbol.Name == "Exception" || 
-               (typeSymbol.BaseType != null && IsExceptionType(typeSymbol.BaseType)));
-    }
+    private bool IsExceptionType
+        (ITypeSymbol typeSymbol)
+        => typeSymbol != null && (typeSymbol.Name == "Exception" || (typeSymbol.BaseType != null && IsExceptionType(typeSymbol.BaseType)));
 }

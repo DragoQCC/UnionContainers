@@ -7,8 +7,8 @@ public interface IUnionContainer
 {
     public UnionContainerState State { get; internal set; }
     internal List<IError>? Errors { get; set; }
-    
-    
+
+
     /*public void AddError(IError error)
     {
         Errors ??= [];
@@ -18,52 +18,54 @@ public interface IUnionContainer
             State = UnionContainerState.Error;
         }
     }*/
-    
+
     public void AddErrors(params IError[] errors)
     {
-        Errors ??= [];
+        Errors ??= [ ];
         Errors.AddRange(errors);
-        if(State != UnionContainerState.Error)
+        if (State != UnionContainerState.Error)
         {
             State = UnionContainerState.Error;
         }
     }
-    
+
     public bool HasErrors() => Errors?.Count > 0;
-    
-    public List<IError> GetErrors() => Errors ?? new();
+
+    public List<IError> GetErrors() => Errors ?? new List<IError>();
 
     public List<TError> GetErrors<TError>()
     {
-        Errors ??= [];
+        Errors ??= [ ];
         if (Errors.Count == 0)
         {
-            return [];
+            return [ ];
         }
+
         var returnList = new List<TError>();
-        foreach (var error in Errors)
+        foreach (IError error in Errors)
         {
             if (error is TError errorValue)
             {
                 returnList.Add(errorValue);
             }
         }
+
         return returnList;
     }
-    
+
     public void ForState(UnionContainerState state, Action action)
     {
-        if (this.State == state)
+        if (State == state)
         {
             action();
         }
     }
-    
-    public void ForState(Action? defaultAction = null, params ValueTuple<UnionContainerState,Action>[] targetState)
+
+    public void ForState(Action? defaultAction = null, params ValueTuple<UnionContainerState, Action>[] targetState)
     {
-        foreach (var (state, action) in targetState)
+        foreach ((UnionContainerState state, Action action) in targetState)
         {
-            if (this.State == state)
+            if (State == state)
             {
                 action();
             }
@@ -73,24 +75,18 @@ public interface IUnionContainer
             }
         }
     }
-    
-    internal void SetState(UnionContainerState state)
-    {
-        State = state;
-    }
-    
+
+    internal void SetState(UnionContainerState state) => State = state;
 }
 
-
-public interface IUnionContainer<TContainer> : IUnionContainer where TContainer : IUnionContainer<TContainer>;
+public interface IUnionContainer<TContainer> : IUnionContainer
+where TContainer : IUnionContainer<TContainer>;
 
 public interface IUnionResultContainer<TValueTuple> : IUnionContainer<IUnionResultContainer<TValueTuple>>
-    where TValueTuple : struct, ITuple
+where TValueTuple : struct, ITuple
 {
     internal TValueTuple ResultValue { get; init; }
 }
-
-
 
 /*/// <summary>
 /// A result type wrapper that can contain one of the supplied value types <br/>
@@ -530,5 +526,3 @@ public abstract record UnionContainerBase<TContainer,TValueTuple,TError> : ISeri
     }
 
 }*/
-
-

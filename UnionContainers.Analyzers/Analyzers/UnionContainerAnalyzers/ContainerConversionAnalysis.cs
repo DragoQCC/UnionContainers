@@ -11,20 +11,17 @@ namespace UnionContainersAnalyzersAndSourceGen.Analyzers.UnionContainerAnalyzers
 public class ContainerConvertorAnalyzer : DiagnosticAnalyzer
 {
     private const string InvalidContainerConversionDiagnosticId = "UNCT004";
+    private const string Category = "Usage";
     private static readonly string InvalidContainerConversionTitle = "Invalid Container Conversion";
     private static readonly string InvalidContainerConversionMessageFormat = "The source container type '{0}' cannot be converted to the target container type '{1}'";
-    private static readonly string InvalidContainerConversionDescription =  "The target container type must contain all the generic types of the source container type.";
-    private const string Category = "Usage";
+    private static readonly string InvalidContainerConversionDescription = "The target container type must contain all the generic types of the source container type.";
 
-    private static readonly DiagnosticDescriptor ContainerConversionRule = new DiagnosticDescriptor(
-        InvalidContainerConversionDiagnosticId,
-        InvalidContainerConversionTitle,
-        InvalidContainerConversionMessageFormat,
-        Category,
-        DiagnosticSeverity.Error,
-        isEnabledByDefault: true,
-        description: InvalidContainerConversionDescription);
-    
+    private static readonly DiagnosticDescriptor ContainerConversionRule = new
+    (
+        InvalidContainerConversionDiagnosticId, InvalidContainerConversionTitle, InvalidContainerConversionMessageFormat, Category, DiagnosticSeverity.Error, true,
+        InvalidContainerConversionDescription
+    );
+
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(ContainerConversionRule);
 
     public override void Initialize(AnalysisContext context)
@@ -38,30 +35,34 @@ public class ContainerConvertorAnalyzer : DiagnosticAnalyzer
     {
         var invocationExpr = (InvocationExpressionSyntax)context.Node;
         var memberAccessExpr = invocationExpr.Expression as MemberAccessExpressionSyntax;
-        
+
         if (memberAccessExpr?.Name.ToString() != "TryConvertContainer")
         {
             return;
         }
-        var sourceContainerType = ModelExtensions.GetTypeInfo(context.SemanticModel, memberAccessExpr.Expression).Type;
+
+        ITypeSymbol? sourceContainerType = ModelExtensions.GetTypeInfo(context.SemanticModel, memberAccessExpr.Expression).Type;
 
         if (invocationExpr.ArgumentList.Arguments[0].Expression is not TypeOfExpressionSyntax typeOfExpr)
         {
             return;
         }
-        var targetContainerType = ModelExtensions.GetTypeInfo(context.SemanticModel, typeOfExpr.Type).Type;
+
+        ITypeSymbol? targetContainerType = ModelExtensions.GetTypeInfo(context.SemanticModel, typeOfExpr.Type).Type;
 
         if (sourceContainerType is not INamedTypeSymbol sourceNamedType || targetContainerType is not INamedTypeSymbol targetNamedType)
         {
             return;
         }
-        var sourceGenerics = sourceNamedType.TypeArguments;
-        var targetGenerics = targetNamedType.TypeArguments;
+
+        ImmutableArray<ITypeSymbol> sourceGenerics = sourceNamedType.TypeArguments;
+        ImmutableArray<ITypeSymbol> targetGenerics = targetNamedType.TypeArguments;
 
         if (sourceGenerics.All(x => targetGenerics.Contains(x)))
         {
             return;
         }
+
         var diagnostic = Diagnostic.Create(ContainerConversionRule, invocationExpr.GetLocation(), sourceNamedType.ToDisplayString(), targetNamedType.ToDisplayString());
         context.ReportDiagnostic(diagnostic);
     }

@@ -1,4 +1,5 @@
-﻿using System.Collections.Immutable;
+﻿using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -14,12 +15,17 @@ public class MethodToContainerAnalyzer : DiagnosticAnalyzer
     private const string Category = "Type Safety";
 
     private static readonly LocalizableString Title = "Invalid type usage";
-    private static readonly LocalizableString MessageFormat = "The return type '{0}' is not allowed Return types for MethodToContainer must be one of the specified types: {1} or a derived type", ReturnType, allowedTypes;
+
+    private static readonly LocalizableString MessageFormat =
+            "The return type '{0}' is not allowed Return types for MethodToContainer must be one of the specified types: {1} or a derived type",
+        ReturnType,
+        allowedTypes;
+
     private static readonly LocalizableString Description = "Ensures that the used type is one of the allowed types specified by the AllowedTypesAttribute.";
 
-    private static readonly DiagnosticDescriptor Rule = new DiagnosticDescriptor(DiagnosticId, Title, MessageFormat, Category, DiagnosticSeverity.Error, isEnabledByDefault: true, description: Description);
+    private static readonly DiagnosticDescriptor Rule = new(DiagnosticId, Title, MessageFormat, Category, DiagnosticSeverity.Error, true, Description);
 
-    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [Rule];
+    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [ Rule ];
 
     public override void Initialize(AnalysisContext context)
     {
@@ -34,7 +40,7 @@ public class MethodToContainerAnalyzer : DiagnosticAnalyzer
         // Check if it's a MethodToContainer call
         bool isMethodToContainer = false;
         INamedTypeSymbol? containerType = null;
-        ImmutableArray<ITypeSymbol> containerGenerics = [];
+        ImmutableArray<ITypeSymbol> containerGenerics = [ ];
 
         if (invocationExpressionSyntax.Expression is MemberAccessExpressionSyntax memberAccess)
         {
@@ -50,7 +56,7 @@ public class MethodToContainerAnalyzer : DiagnosticAnalyzer
             if (genericName.Identifier.Text == "MethodToContainer")
             {
                 isMethodToContainer = true;
-                var symbolInfo = context.SemanticModel.GetSymbolInfo(invocationExpressionSyntax);
+                SymbolInfo symbolInfo = context.SemanticModel.GetSymbolInfo(invocationExpressionSyntax);
                 if (symbolInfo.Symbol is IMethodSymbol methodSymbol)
                 {
                     containerType = methodSymbol.ReturnType as INamedTypeSymbol;
@@ -63,21 +69,21 @@ public class MethodToContainerAnalyzer : DiagnosticAnalyzer
         {
             return;
         }
-        
-        ImmutableArray<INamedTypeSymbol> targetGenerics = ImmutableArray<INamedTypeSymbol>.Empty;
-        
+
+        var targetGenerics = ImmutableArray<INamedTypeSymbol>.Empty;
+
         if (containerGenerics.Any())
         {
-            foreach (var generic in containerGenerics)
+            foreach (ITypeSymbol? generic in containerGenerics)
             {
                 //string genericText = generic.ToString();
                 if (generic is INamedTypeSymbol namedTypeSymbol && namedTypeSymbol.Name == "UnionContainer")
                 {
                     //string nestedGenerics = genericText.Split('<', '>')[1];
-                    var nestedGenerics = namedTypeSymbol.TypeArguments;
+                    ImmutableArray<ITypeSymbol> nestedGenerics = namedTypeSymbol.TypeArguments;
                     //LogMessage($"Nested generics found in container type: {string.Join(", ", nestedGenerics)}");
 
-                    foreach (var nestedGeneric in nestedGenerics)
+                    foreach (ITypeSymbol? nestedGeneric in nestedGenerics)
                     {
                         if (nestedGeneric is INamedTypeSymbol nestedNamedType)
                         {
@@ -98,24 +104,25 @@ public class MethodToContainerAnalyzer : DiagnosticAnalyzer
         }
 
         // Find the lambda expression
-        var lambdaExpression = invocationExpressionSyntax.DescendantNodes().OfType<LambdaExpressionSyntax>().FirstOrDefault();
+        LambdaExpressionSyntax? lambdaExpression = invocationExpressionSyntax.DescendantNodes().OfType<LambdaExpressionSyntax>().FirstOrDefault();
         if (lambdaExpression == null)
         {
             return;
         }
 
         // Analyze return statements within the lambda
-        var returnStatements = lambdaExpression.DescendantNodes().OfType<ReturnStatementSyntax>();
+        IEnumerable<ReturnStatementSyntax> returnStatements = lambdaExpression.DescendantNodes().OfType<ReturnStatementSyntax>();
 
-        foreach (var returnStatement in returnStatements)
+        foreach (ReturnStatementSyntax? returnStatement in returnStatements)
         {
-            if(returnStatement.Expression == null)
+            if (returnStatement.Expression == null)
             {
                 continue;
             }
-            var returnType = context.SemanticModel.GetTypeInfo(returnStatement.Expression).Type;
-            
-            if(targetGenerics.All(genericArgument => !IsAssignableTo(returnType, genericArgument)))
+
+            ITypeSymbol? returnType = context.SemanticModel.GetTypeInfo(returnStatement.Expression).Type;
+
+            if (targetGenerics.All(genericArgument => !IsAssignableTo(returnType, genericArgument)))
             {
                 var typeMismatchDiag = Diagnostic.Create(Rule, returnStatement.GetLocation(), returnType?.ToString(), string.Join(", ", targetGenerics.Select(g => g.ToString())));
                 context.ReportDiagnostic(typeMismatchDiag);
@@ -123,11 +130,12 @@ public class MethodToContainerAnalyzer : DiagnosticAnalyzer
         }
     }
 
-    private bool IsAssignableTo(ITypeSymbol? typeSymbol, ITypeSymbol? targetType)
-    {
-        return typeSymbol != null && targetType != null &&
-               (SymbolEqualityComparer.Default.Equals(typeSymbol, targetType) ||
-                typeSymbol.AllInterfaces.Any(i => SymbolEqualityComparer.Default.Equals(i, targetType)) ||
-                IsAssignableTo(typeSymbol.BaseType, targetType));
-    }
+    private bool IsAssignableTo
+        (ITypeSymbol? typeSymbol, ITypeSymbol? targetType)
+        => typeSymbol != null
+            && targetType != null
+            && (SymbolEqualityComparer.Default.Equals
+                    (typeSymbol, targetType)
+                || typeSymbol.AllInterfaces.Any(i => SymbolEqualityComparer.Default.Equals(i, targetType))
+                || IsAssignableTo(typeSymbol.BaseType, targetType));
 }

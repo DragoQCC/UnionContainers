@@ -15,6 +15,12 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnionContainers.Tests.Integ
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnionContainers.Tests.Unit", "UnionContainers.Tests.Unit\UnionContainers.Tests.Unit.csproj", "{2B020157-D24B-4A8B-B1A0-C3F093F700EF}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SolutionItems", "SolutionItems", "{B9637514-797E-4539-A534-4598A1E89EDE}"
+	ProjectSection(SolutionItems) = preProject
+		README.md = README.md
+		.github\workflows\publish.yml = .github\workflows\publish.yml
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU

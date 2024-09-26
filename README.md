@@ -1,27 +1,49 @@
 # Union Container
-`UnionContainers` is a library that provides a discriminated union like type in C#.
-It is not a pure copy of a discriminated union, but it is a close approximation with some extras mixed in to make working with this type as painless as possible in existing or new C# projects.
 
-The `UnionContainers` library uses Roslyn source generators & diagnostic analyzers to assist in the creation and usage of `UnionContainers`.
-This helps to ensure compile time checks are performed to minimize runtime errors. It also provides the ability to have type safe, strongly typed compile time code without the overhead of reflection or dynamic types.
+`UnionContainers` is a library that provides a discriminated union like type in C#.
+It is not a pure copy of a discriminated union, but it is a close approximation with some extras mixed in to make
+working with this type as painless as possible in existing or new C# projects.
+
+The `UnionContainers` library uses Roslyn source generators & diagnostic analyzers to assist in the creation and usage
+of `UnionContainers`.
+This helps to ensure compile time checks are performed to minimize runtime errors. It also provides the ability to have
+type safe, strongly typed compile time code without the overhead of reflection or dynamic types.
 
 ## Features & Benefits
-- **Type Safety**: The `UnionContainers` library provides type safety by using Roslyn diagnostic analyzers to prevent assignment of invalid types to `UnionContainers` & from `UnionContainers`.
-- **Compile Time Checks**: The `UnionContainers` library provides several compile time checks to ensure that the `UnionContainers` are used correctly.
-- **Little Reflection**: The `UnionContainers` library only uses reflection when required (ex. match dynamic delegates to the container type), it uses generics to enforce strongly typed containers.
-- **Avoid Null Reference Exceptions**: The `UnionContainers` library helps to avoid null reference exceptions by providing a way to handle empty containers.
-- **Set custom error messages**: `UnionContainers` can hold error messages for non-exceptional failures such as not finding an item in a list or failing a validation check.
-- **Propagate Exceptions**: `UnionContainers` can hold exceptions that are thrown during the execution of a function, this allows the caller to receive the full exception for inspection to determine the best path forward without need a bunch of try catch blocks.
-- **Wrap non-user defined types**: The `UnionContainers` library can execute a supplied method call using the `MethodToContainer` method and wrap the result in an `UnionContainer`. This includes wrapping any exceptions so that they can be handled by the caller as desired.
-- **Limit allowed types**: The `AllowedTypes` & `DeniedTypes` attributes can be used to limit the types allowed in a property, field, method parameter, method return type, class generic type parameter, or method generic type parameter.
-- **Avoid needless method overrides**: Since Union Containers can hold multiple types, they can be used to avoid the need for multiple overrides of a method that take different types of arguments to perform the same action. ex. Finding a user by name or id.
+
+- **Type Safety**: The `UnionContainers` library provides type safety by using Roslyn diagnostic analyzers to prevent
+  assignment of invalid types to `UnionContainers` & from `UnionContainers`.
+- **Compile Time Checks**: The `UnionContainers` library provides several compile time checks to ensure that the
+  `UnionContainers` are used correctly.
+- **Little Reflection**: The `UnionContainers` library only uses reflection when required (ex. match dynamic delegates
+  to the container type), it uses generics to enforce strongly typed containers.
+- **Avoid Null Reference Exceptions**: The `UnionContainers` library helps to avoid null reference exceptions by
+  providing a way to handle empty containers.
+- **Set custom error messages**: `UnionContainers` can hold error messages for non-exceptional failures such as not
+  finding an item in a list or failing a validation check.
+- **Propagate Exceptions**: `UnionContainers` can hold exceptions that are thrown during the execution of a function,
+  this allows the caller to receive the full exception for inspection to determine the best path forward without need a
+  bunch of try catch blocks.
+- **Wrap non-user defined types**: The `UnionContainers` library can execute a supplied method call using the
+  `MethodToContainer` method and wrap the result in an `UnionContainer`. This includes wrapping any exceptions so that
+  they can be handled by the caller as desired.
+- **Limit allowed types**: The `AllowedTypes` & `DeniedTypes` attributes can be used to limit the types allowed in a
+  property, field, method parameter, method return type, class generic type parameter, or method generic type parameter.
+- **Avoid needless method overrides**: Since Union Containers can hold multiple types, they can be used to avoid the
+  need for multiple overrides of a method that take different types of arguments to perform the same action. ex. Finding
+  a user by name or id.
 
 ## Installation
-Interested in trying the library out? You can install it via NuGet Package Manager Console by running the following command:
+
+Interested in trying the library out? You can install it via NuGet Package Manager Console by running the following
+command:
+
 ```bash
 Install-Package UnionContainers
 ```
+
 Next add a using statement to the top of your file to use the library
+
 ```csharp
 using UnionContainer.Core.Common;
 using UnionContainer.Core.Helpers;
@@ -29,15 +51,17 @@ using UnionContainer.Core.UnionContainers;
 using UnionContainers.Shared.Common;
 ```
 
-## What is a UnionContainer? 
-A Union Container is a type that can be in one of four states: 
-    
+## What is a UnionContainer?
+
+A Union Container is a type that can be in one of four states:
+
 - **Empty** - The container is empty and has no value.
 - **Valid Value** - The container has a valid value of one of the possible types.
 - **Error** - The container has a custom error value set.
 - **Exception** - The container has an exception value set.
 
-All containers start in an empty state and only transition out of that state when a value of a valid type is set or optionally when an exception/error is present.
+All containers start in an empty state and only transition out of that state when a value of a valid type is set or
+optionally when an exception/error is present.
 
 an example of a simple `UnionContainer` is shown below:
 
@@ -49,18 +73,24 @@ public static UnionContainer<int> DivideByZeroTestContainer()
     return container;
 }
 ```
+
 The divide method mentioned above looks like this:
+
 ```csharp
 public static int Divide(int a, int b)
 {
     return a / b;
 }
 ```
-The `MethodToContainer` method is a helper method that will execute the supplied function and wrap the result in an `UnionContainer`. 
-If the function throws an exception, the exception will be caught and placed in the Exception value of the`UnionContainer`.
+
+The `MethodToContainer` method is a helper method that will execute the supplied function and wrap the result in an
+`UnionContainer`.
+If the function throws an exception, the exception will be caught and placed in the Exception value of the
+`UnionContainer`.
 
 the container can then be inspected in a number of ways to determine the state of the container and act accordingly.
 The most straightforward way is just to call the different state checking extension methods.
+
 ```csharp
 if (container.IsEmpty)
 {
@@ -81,6 +111,7 @@ else if (container.HasException)
 ```
 
 In the previous example the output would be
+
 ```text
 container is Empty
 Container has an exception: System.DivideByZeroException: Attempted to divide by zero.
@@ -89,7 +120,9 @@ Container has an exception: System.DivideByZeroException: Attempted to divide by
 ## Basic Usage
 
 ### Null Handling
+
 Containers will also gracefully handle null values and will be in an empty state if a null value is assigned to them.
+
 ```csharp
 UnionContainer<int> container = null;
 if (container.IsEmpty)
@@ -101,10 +134,14 @@ if (container.HasValue)
     Console.WriteLine($"Container has a value: {container.Value}");
 }
 ```
+
 the above will output `container is empty` as the container is null and therefore never left the empty state.
 
 ### Empty State
-The `Empty` state is a state that is set to struct that is meant to contain no values and acts as a replacement for null/void values.
+
+The `Empty` state is a state that is set to struct that is meant to contain no values and acts as a replacement for
+null/void values.
+
 ```csharp
 [Serializable]
 [StructLayout(LayoutKind.Sequential, Size = 1)]
@@ -115,7 +152,9 @@ public record struct Empty
     public static Empty Return() => Nothing;
 }
 ```
+
 The `Empty` static class contains instances of these types that can be used to set the state of a container to empty.
+
 ```csharp
 public static class Empty
 {
@@ -132,11 +171,14 @@ public static class Empty
     public static NullEmptyType Null => new NullEmptyType();
 }
 ```
-This means anything in the Empty state refers to one of these instances and therefor is never in a true null state avoiding pesky null reference exceptions.
-This is similar to the Unit type in other languages. The empty type can also be used in place of a void return type / null to represent a lack of a value.
 
+This means anything in the Empty state refers to one of these instances and therefor is never in a true null state
+avoiding pesky null reference exceptions.
+This is similar to the Unit type in other languages. The empty type can also be used in place of a void return type /
+null to represent a lack of a value.
 
 ### UnionContainer Types
+
 The other primary benefit of the Union Containers is that they can be created with allowed values ranging from T1 - T16.
 This means you can create a container that may contain a value for one of up to 16 different possible types.
 
@@ -153,11 +195,13 @@ var container = MethodToContainer(() =>
 });
 ```
 
-In the above example, the container will be a `UnionContainer<string,HttpStatusCode>` and can contain either a `string` or a `HttpStatusCode` value.
+In the above example, the container will be a `UnionContainer<string,HttpStatusCode>` and can contain either a `string`
+or a `HttpStatusCode` value.
 It can also contain an error or exception if one is thrown during the execution of the function.
 
 The `UnionContainers` library also provides a way to create a container with a custom error message.
 This can be useful when you want to provide a custom error message to the caller.
+
 ```csharp
 UnionContainer<int?> container = myNumberFunction();
 
@@ -171,14 +215,20 @@ if (container.HasError())
     Console.WriteLine($"Container has an error: {container.GetErrorValues()}");
 }
 ```
-In the above example we wrap a nullable int in an `UnionContainer` and then set an error state with a custom error message if the value is 42.
-The `TryGetValue` call only succeeds if an int was set in the container, this can be used together with the `is` operator to check the value of the container in a safe way.
-the Error type is a list of objects and new items are cast to the type of the first error and added to the list, this allows for a single error state to hold multiple error messages.
 
+In the above example we wrap a nullable int in an `UnionContainer` and then set an error state with a custom error
+message if the value is 42.
+The `TryGetValue` call only succeeds if an int was set in the container, this can be used together with the `is`
+operator to check the value of the container in a safe way.
+the Error type is a list of objects and new items are cast to the type of the first error and added to the list, this
+allows for a single error state to hold multiple error messages.
 
 ### Creating Union Containers
+
 Union Containers can be created in a few different ways some are implicit and some are explicit.
-#### implicit examples 
+
+#### implicit examples
+
 ```csharp
 public class ImplicitContainerCreation
 {
@@ -199,6 +249,7 @@ public class ImplicitContainerCreation
 ```
 
 #### Explicit examples
+
 ```csharp
 public class ExplicitContainerCreation
 {
@@ -276,7 +327,9 @@ public class ExplicitContainerCreation
 ```
 
 ### Using Union Containers
-Union Containers are used in a variety of ways, including as previously mentioned as a wrapper for a function call, they can also be used directly as method argument values or as a return type.
+
+Union Containers are used in a variety of ways, including as previously mentioned as a wrapper for a function call, they
+can also be used directly as method argument values or as a return type.
 
 ```csharp
 public static UnionContainer<Employee> TryGetEmployeeByNameOrId(UnionContainer<string,int,Guid> nameOrId)
@@ -324,12 +377,19 @@ public static UnionContainer<Employee> TryGetEmployeeByNameOrId(UnionContainer<s
     return container;
 }
 ```
-In the above example we can see a Union Container of `UnionContainer<string,int,Guid>` is passed into this method as an argument this means we know the value will not be null & will be one of the three types.
-We can then use a match expression to determine which type the value is and return the correct employee from the list of employees. If an employee is not found the container is kept empty and an error state is set.
-This also avoids the need for returning null or throwing exceptions for non-exceptional cases.
-Using UnionContainers in this manner to present a few similar options for an argument allows for the creation of 1 single method with can then handle multiple types of input and return the correct value vs needing to create an override for name as a string, id as an int, id as a guid etc.
 
-when invoking code like what is above the caller does not have to pass in a Union Container but can pass in any of the allowed argument values
+In the above example we can see a Union Container of `UnionContainer<string,int,Guid>` is passed into this method as an
+argument this means we know the value will not be null & will be one of the three types.
+We can then use a match expression to determine which type the value is and return the correct employee from the list of
+employees. If an employee is not found the container is kept empty and an error state is set.
+This also avoids the need for returning null or throwing exceptions for non-exceptional cases.
+Using UnionContainers in this manner to present a few similar options for an argument allows for the creation of 1
+single method with can then handle multiple types of input and return the correct value vs needing to create an override
+for name as a string, id as an int, id as a guid etc.
+
+when invoking code like what is above the caller does not have to pass in a Union Container but can pass in any of the
+allowed argument values
+
 ```csharp
 UnionContainer<Employee> container = new container = TryGetEmployeeByNameOrId("Jane Doe");
 if(container.HasResult())
@@ -342,13 +402,20 @@ if(container.HasResult())
 }
 ```
 
-We also see a Union Container is returned from this method, this is a common pattern when using Union Containers as it allows the caller to handle the different outcome states in a safe way.
-For example this function might not find an employee with the provided name or id and need to return an error message about what went wrong, it might also want to perform some validation logic and return an error state if the validation fails.
-Lastly it might throw an exception if the code is not functioning as expected. The container produced will contain the whole exception and can be inspected by the caller to determine what went wrong and how to best handle it.
+We also see a Union Container is returned from this method, this is a common pattern when using Union Containers as it
+allows the caller to handle the different outcome states in a safe way.
+For example this function might not find an employee with the provided name or id and need to return an error message
+about what went wrong, it might also want to perform some validation logic and return an error state if the validation
+fails.
+Lastly it might throw an exception if the code is not functioning as expected. The container produced will contain the
+whole exception and can be inspected by the caller to determine what went wrong and how to best handle it.
 
-### Updating the state of the container 
-The state of the container can be set with the `SetEmptyState`, `SetErrorState`, `SetExceptionState`, and `SetValueState` methods.
-Each of these methods will set the state of the container to the provided state and return the container to allow for method chaining.
+### Updating the state of the container
+
+The state of the container can be set with the `SetEmptyState`, `SetErrorState`, `SetExceptionState`, and
+`SetValueState` methods.
+Each of these methods will set the state of the container to the provided state and return the container to allow for
+method chaining.
 
 ```csharp
 //create a container of type employee,Manager
@@ -389,12 +456,14 @@ container.SetErrorState("An error occurred", "A second error message", 5);
 container.SetEmptyState();
 ```
 
+### Getting the value out of a container
 
-### Getting the value out of a container 
 Getting the value out of a container is done in a few different ways depending on the state of the container.
-It is not required to supply logic for all states of a container, but it is recommended to do so to ensure that all possible states are handled correctly / accounted for.
+It is not required to supply logic for all states of a container, but it is recommended to do so to ensure that all
+possible states are handled correctly / accounted for.
 
-#### Issue State matching 
+#### Issue State matching
+
 - an **issue state** is categorized as anything but a valid value state ex.(Empty, Error, Exception)
 
 ```csharp
@@ -467,6 +536,7 @@ public class IssuesMatch
 ```
 
 #### Valid Value State matching
+
 - a **valid value state** is categorized as a state that has a value of one of the possible types.
 
 ```csharp
@@ -556,17 +626,22 @@ public class ResultMatch
 ```
 
 #### TryGetValue
+
 While `TryGetValue` is the easiest way to get a value from a container it can result in a null return value.
+
 ```csharp
 //Single generic type container
 UnionContainer<string> container = "Hello World";
 string? containerValue = container.TryGetValue();
 Console.WriteLine($"Container value: {containerValue}");
 ```
- 
-It is recommended to always perform a type check when getting the value out such as `if (container.TryGetValue() is Employee _employee)` to ensure that the value is of the correct type.
 
-As a note of caution when using `TryGetValue` on a multi container type it is better to use the HandleResult call, this prevents the need for the type checking and avoids runtime errors. 
+It is recommended to always perform a type check when getting the value out such as
+`if (container.TryGetValue() is Employee _employee)` to ensure that the value is of the correct type.
+
+As a note of caution when using `TryGetValue` on a multi container type it is better to use the HandleResult call, this
+prevents the need for the type checking and avoids runtime errors.
+
 ```csharp
 //Ok
 UnionContainer<string> container = "Hello World";
@@ -581,12 +656,15 @@ UnionContainer<string> container = "Hello World";
 container.MatchResult((string value) => Console.WriteLine($"Container value: {value}"));
 ```
 
-However, if desired the `TryGetValue` method can be given an optional value/method to supply a backup return value in the case where the container is empty, in a null state, or contains an error.
+However, if desired the `TryGetValue` method can be given an optional value/method to supply a backup return value in
+the case where the container is empty, in a null state, or contains an error.
+
 ```csharp
 UnionContainer<string> container = null;
 string containerValue = container.TryGetValue(fallbackValue: "No value found");
 Console.WriteLine($"Container value: {containerValue}");
 ```
+
 ```csharp
 UnionContainer<string> container = null;
 string containerValue = container.TryGetValue(fallbackValueMethod: () => 
@@ -597,11 +675,13 @@ string containerValue = container.TryGetValue(fallbackValueMethod: () =>
 Console.WriteLine($"Container value: {containerValue}");
 ```
 
-
-
 #### HandleResult
-Handle results lets you stay in the context of a container while providing a way to execute different actions based on the type of the value in the container.
-This prevents any miscasts or null reference exceptions that could occur when trying to get the value out of the container and then perform actions on it.
+
+Handle results lets you stay in the context of a container while providing a way to execute different actions based on
+the type of the value in the container.
+This prevents any miscasts or null reference exceptions that could occur when trying to get the value out of the
+container and then perform actions on it.
+
 ```csharp
 UnionContainer<Employee,Manager> container = GetEmployeeOrManagerByNameOrId("Jane Doe");
 container.MatchResult(
@@ -610,7 +690,10 @@ container.MatchResult(
     //executes if the value is a manager
     manager => Console.WriteLine($"Found manager \n info: {manager.Name} is a {manager.JobTitle} and makes {manager.Salary} as of {manager.StartDate}"));
 ```
-`MatchResult` also contains options for a catch handler method to be passed in `Func<Exception,T>? catchHandler` which can be used to handle exceptions that occur during the execution of the passed in methods.
+
+`MatchResult` also contains options for a catch handler method to be passed in `Func<Exception,T>? catchHandler` which
+can be used to handle exceptions that occur during the execution of the passed in methods.
+
 ```csharp
 container.MatchResult((Employee employee) =>
         {
@@ -623,12 +706,18 @@ container.MatchResult((Employee employee) =>
             return "exception";
         },  fallbackValue: "none");
 ```
+
 There is also an Action override if you do not need to return a value from the method passed in.
 
 ##### GetMatchedItem
-The `GetMatchedItem` method can be used to get the value of the container in a safe way. It also has a matching method `GetMatchedItemAs<T>` that can be used to cast the matched item to a specific type.
-The matched item is NOT the result of the container, instead when a method is passed in to handle the result of the container the matched item is the value that was matched or returned by the method.
-The value returned from the executed method is then cleared and a new method can be executed to handle the result in a different way.
+
+The `GetMatchedItem` method can be used to get the value of the container in a safe way. It also has a matching method
+`GetMatchedItemAs<T>` that can be used to cast the matched item to a specific type.
+The matched item is NOT the result of the container, instead when a method is passed in to handle the result of the
+container the matched item is the value that was matched or returned by the method.
+The value returned from the executed method is then cleared and a new method can be executed to handle the result in a
+different way.
+
 ```csharp
 public static void ContainerSingleHandleValueExtract()
     {
@@ -704,7 +793,9 @@ public static void ContainerSingleHandleValueExtract()
     }
 ```
 
-looking at the above example we can see where a method was passed in to handle the result of the container and return the name of the employee stored in the container.
+looking at the above example we can see where a method was passed in to handle the result of the container and return
+the name of the employee stored in the container.
+
 ```csharp
 string containerExtractedName = container.MatchResult((Employee employee) =>
 {
@@ -712,14 +803,20 @@ string containerExtractedName = container.MatchResult((Employee employee) =>
     return employee.Name;
 }, fallbackValue:"none").GetMatchedItemAs<string>()!;
 ```
-the `GetMatchedItemAs<string>()` will only return a value if the method passed in is executed and returns a value, if the container is empty or in an error or exception state the `GetMatchedItemAs<string>()` will return null.
-This can be accounted for by using the `fallbackValue` parameter to allow a default to be returned if the passed in method does not execute or errors out.
 
+the `GetMatchedItemAs<string>()` will only return a value if the method passed in is executed and returns a value, if
+the container is empty or in an error or exception state the `GetMatchedItemAs<string>()` will return null.
+This can be accounted for by using the `fallbackValue` parameter to allow a default to be returned if the passed in
+method does not execute or errors out.
 
 #### TryGetValue vs HandleResult with GetMatchedItem
-Both of these methods will allow you to extract the result value from the container, but they are used in different ways.
+
+Both of these methods will allow you to extract the result value from the container, but they are used in different
+ways.
 TryGetValue is used when you want to get the value out of the container and then perform actions on it.
-HandleResult with GetMatchedItem is used when you want to perform actions on the value in the container and then get the value out.
+HandleResult with GetMatchedItem is used when you want to perform actions on the value in the container and then get the
+value out.
+
 ```csharp
 public static void ExampleMethod()
 {
@@ -749,14 +846,18 @@ public static void ExampleMethod()
     Console.WriteLine($"The value is {number3}"); // prints 15
 }
 ```
-Here we see that when TryGetValue is used the int value is extracted from the container and is equal to 5.
-When HandleResult with GetMatchedItem is used the container first ensures the value is an int, and then runs the supplied method adding 5 to it, 
-the int value the method returns is then extracted with the GetMatchedItemAs method and is equal to 10.
-Again since the value of the executed method is cleared after its extracted a new MatchResult method can be executed to handle the value in a different way, this time printing 15.
 
+Here we see that when TryGetValue is used the int value is extracted from the container and is equal to 5.
+When HandleResult with GetMatchedItem is used the container first ensures the value is an int, and then runs the
+supplied method adding 5 to it,
+the int value the method returns is then extracted with the GetMatchedItemAs method and is equal to 10.
+Again since the value of the executed method is cleared after its extracted a new MatchResult method can be executed to
+handle the value in a different way, this time printing 15.
 
 #### All State matching
-- It is also possible to chain function calls together to set code execution paths for all the possible states of the container.
+
+- It is also possible to chain function calls together to set code execution paths for all the possible states of the
+  container.
 
 ```csharp
 namespace DemoApp.ContainerResultMatchExamples;
@@ -792,28 +893,44 @@ public class AllMatch
 ```
 
 ## Compile time checks
-Currently, the `UnionContainers` library provides a few compile time checks to ensure that the `UnionContainers` are used correctly.
-- **UNCT001: Invalid argument type for UnionContainer creation or value setting** - This diagnostic is raised when an `UnionContainer` is created with a type that is not a valid type.
+
+Currently, the `UnionContainers` library provides a few compile time checks to ensure that the `UnionContainers` are
+used correctly.
+
+- **UNCT001: Invalid argument type for UnionContainer creation or value setting** - This diagnostic is raised when an
+  `UnionContainer` is created with a type that is not a valid type.
 - **UNCT002:** - Not implemented
 - **UNCT003:** - Not implemented
-- **UNCT004: Invalid Container Conversion** - The target container type must contain all the generic types of the source container type.
-- **UNCT005: Incompatible type assignment from TryGetValue** - Warns about potential type mismatches when assigning the result of TryGetValue to a variable.
-- **UNCT006: Invalid type usage** - Ensures that the used type is one of the allowed types specified by the AllowedTypesAttribute.
-- **UNCT007: Invalid HandleResult usage - Warning** - Detects when a chain of MatchResult calls might not handle all types from the original UnionContainer.
-- **UNCT008: Invalid type usage** - Ensures that the used type is not one of the denied types specified by the DeniedTypesAttribute.
+- **UNCT004: Invalid Container Conversion** - The target container type must contain all the generic types of the source
+  container type.
+- **UNCT005: Incompatible type assignment from TryGetValue** - Warns about potential type mismatches when assigning the
+  result of TryGetValue to a variable.
+- **UNCT006: Invalid type usage** - Ensures that the used type is one of the allowed types specified by the
+  AllowedTypesAttribute.
+- **UNCT007: Invalid HandleResult usage - Warning** - Detects when a chain of MatchResult calls might not handle all
+  types from the original UnionContainer.
+- **UNCT008: Invalid type usage** - Ensures that the used type is not one of the denied types specified by the
+  DeniedTypesAttribute.
 - **UNCT009: Invalid type usage** - Detects when MatchResult is invoked with incorrect types.
-- **UNCT010** - Detects when a return type is not allowed Return types for MethodToContainer must be one of the containers specified types
+- **UNCT010** - Detects when a return type is not allowed Return types for MethodToContainer must be one of the
+  containers specified types
 
 **Check the demo project for examples of how to use the `UnionContainers` library.**
 
-
 ## Allowed Types & Denied Types Attribute
-The `UnionContainers` library provides two attributes that can be used to specify the allowed and denied types in a few key places.
-The goal here is to allow the developer the ability to limit a value to a specific set of types or to deny a specific set of types without forcing the use of Union Containers. 
-Unlike a Union Container which uses strongly typed generics to ensure the correct type is used, these attributes are used to ensure that the correct types are used in the correct places but casting would still have to occur during runtime 
 
-Both of these attributes can take between 1 and 16 types as generic type arguments, this is to allow for the most flexibility in the use of these attributes.
+The `UnionContainers` library provides two attributes that can be used to specify the allowed and denied types in a few
+key places.
+The goal here is to allow the developer the ability to limit a value to a specific set of types or to deny a specific
+set of types without forcing the use of Union Containers.
+Unlike a Union Container which uses strongly typed generics to ensure the correct type is used, these attributes are
+used to ensure that the correct types are used in the correct places but casting would still have to occur during
+runtime
+
+Both of these attributes can take between 1 and 16 types as generic type arguments, this is to allow for the most
+flexibility in the use of these attributes.
 they can be used in the following places:
+
 - Properties
 - Fields
 - Method Parameters
@@ -821,8 +938,8 @@ they can be used in the following places:
 - Class Generic Type Parameters
 - Method Generic Type Parameters
 
-
 ### AllowedTypesAttribute Examples
+
 ```csharp
 public class AllowedTypesExamples
 {
@@ -913,6 +1030,7 @@ public class AllowedTypesExamples
 ```
 
 - Usage examples (All examples here are from the AllowedTypesExamples class)
+
 ```csharp
 public static void AllowedTypesUsageExample()
     {
@@ -950,9 +1068,12 @@ public static void AllowedTypesUsageExample()
         _typesExamples.TestArgument(hrPerson);
     }
 ```
-The deny types attribute works in a similar way to the allowed types attribute but instead of allowing only the specified types it denies the specified types.
+
+The deny types attribute works in a similar way to the allowed types attribute but instead of allowing only the
+specified types it denies the specified types.
 
 ### Generic class and extension method examples
+
 ```csharp
 public class UnSignedNumbersOnly<[AllowedTypes<byte, ushort, uint, ulong, nuint>] T> where T : struct, IAdditionOperators<T, T, T>, ISubtractionOperators<T, T, T>, IComparisonOperators<T, T, bool>
 {
@@ -992,10 +1113,13 @@ public static class UnSIgnedNumberExtensions
     }
 }
 ```
-In the above code block we see that the UnSignedNumbers class only allows generics of the following types `byte`, `ushort`, `uint`, `ulong`, and `nuint`.
+
+In the above code block we see that the UnSignedNumbers class only allows generics of the following types `byte`,
+`ushort`, `uint`, `ulong`, and `nuint`.
 We also see that the extension method `Add` in the `UnSignedNumberExtensions` class denies the use of the `ulong` type.
 
- - Usage examples
+- Usage examples
+
 ```csharp
 public static void GenericUsageExample()
     {
@@ -1027,22 +1151,31 @@ public static void GenericUsageExample()
         Console.WriteLine(UnSIgnedNumberExtensions.Add(ulongs, ulongNumber1, ulongNumber2));
     }
 ```
-When implementing code that uses those classes like in this above example, the developer can be sure that the types used are the correct types and that the code will not compile if the wrong types are used.
-The third example in the usage examples will not compile as the `int` type is not allowed in the `UnSignedNumbersOnly` class.
+
+When implementing code that uses those classes like in this above example, the developer can be sure that the types used
+are the correct types and that the code will not compile if the wrong types are used.
+The third example in the usage examples will not compile as the `int` type is not allowed in the `UnSignedNumbersOnly`
+class.
 The fourth example will not compile as the `ulong` type is denied in the `UnSignedNumberExtensions` class.
 
-This allows for unconstrained generics to be used in a more controlled way and can help to ensure that the correct types are used in the correct places.
-It can be thought of in the same way as how OptionContains are the one of many vs tuples are the all of many, this is the same for the AllowedTypes and DeniedTypes attributes vs normal constraints where the generic must meet all the type requirements.
+This allows for unconstrained generics to be used in a more controlled way and can help to ensure that the correct types
+are used in the correct places.
+It can be thought of in the same way as how OptionContains are the one of many vs tuples are the all of many, this is
+the same for the AllowedTypes and DeniedTypes attributes vs normal constraints where the generic must meet all the type
+requirements.
 
+## Union Container Conversions
 
-## Union Container Conversions 
-Union Containers can be converted to other types of Union Containers as long as the target container type contains all the generic types of the source container type.
-This is to ensure that the conversion is safe and that the target container can hold all the possible values of the source container.
+Union Containers can be converted to other types of Union Containers as long as the target container type contains all
+the generic types of the source container type.
+This is to ensure that the conversion is safe and that the target container can hold all the possible values of the
+source container.
 
 ```csharp
  UnionContainer<Employee,Manager> container = new();  
 container = UnionContainerFactory.CreateWithValue(employee); 
 ```
+
 The library will automatically convert the container to the correct type if the types are compatible.
 To perform this sort of conversion manually, the `TryConvertContainer` method can be used.
 
@@ -1050,14 +1183,18 @@ To perform this sort of conversion manually, the `TryConvertContainer` method ca
 UnionContainer<Employee> container = new();  
 UnionContainer<Employee,Manager> containerTwo = container.TryConvertContainer(typeof(UnionContainer<Employee,Manager>));
 ```
-This allows for containers that are of a lower type to still be used as argument values, return types etc. in methods that require a higher type of container without needing to extract the value, make a new container, and return the new container.
+
+This allows for containers that are of a lower type to still be used as argument values, return types etc. in methods
+that require a higher type of container without needing to extract the value, make a new container, and return the new
+container.
 All states are transferred to the new container so any value, error, or exception will be present in the new container.
 
-
 ## Global Configuration & logging
+
 The `UnionContainers` library provides a way to configure the behavior of the library globally.
 
 The options that can be configured are:
+
 ```csharp
  /// <summary>
     /// When true the default value will be treated as null <br/>
@@ -1102,6 +1239,7 @@ The options that can be configured are:
 ```
 
 these can be configured in the following way
+
 ```csharp
 builder.Services.AddSingleton<UnionContainerFactory>();
         builder.Services.AddUnionContainerConfiguration(options =>
@@ -1122,11 +1260,16 @@ builder.Services.AddSingleton<UnionContainerFactory>();
         });
 ```
 
-## Functional Methods 
-Along with the Union Containers library, there are a few generic functional methods that will help with a variety of tasks.
-These can be found in the `UnionContainers.Core.Helpers.Functional` and `UnionContainers.Shared.Common.FunctionalExtensions` classes. It includes things like IsNull, IsDefault, TryCatch, IfNullDo, ForEach, etc.
+## Functional Methods
 
-They provide a functional coding style to make things like method chaining easier for example 
+Along with the Union Containers library, there are a few generic functional methods that will help with a variety of
+tasks.
+These can be found in the `UnionContainers.Core.Helpers.Functional` and
+`UnionContainers.Shared.Common.FunctionalExtensions` classes. It includes things like IsNull, IsDefault, TryCatch,
+IfNullDo, ForEach, etc.
+
+They provide a functional coding style to make things like method chaining easier for example
+
 ```csharp
 public class FunctionalExtensionsDemo
 {
@@ -1205,11 +1348,15 @@ public class FunctionalExtensionsDemo
 }
 ```
 
-
 ## Performance
-The `UnionContainers` library is designed to be as performant as possible. With that in mind however, C# does not have native support for Union types (yet) and so the need to cast and perform type checks before getting results or executing supplied methods will have some performance impact.
-The demo project contains a few performance tests that show the performance of the `UnionContainers` library compared to using a switch statement to handle the different types.
+
+The `UnionContainers` library is designed to be as performant as possible. With that in mind however, C# does not have
+native support for Union types (yet) and so the need to cast and perform type checks before getting results or executing
+supplied methods will have some performance impact.
+The demo project contains a few performance tests that show the performance of the `UnionContainers` library compared to
+using a switch statement to handle the different types.
 One such example using the Fody Method Time Library is shown below.
+
 ```csharp
 public static void NonUserMethodToContainer()
 {
@@ -1261,13 +1408,20 @@ public static void NonUserMethodComparision()
     }
 }
 ```
-When the targeted endpoint is not listening for connections and the HttpClient throws an exception, the version with union containers completes in 2070ms, while the version without union containers completes in 2040ms.
-When the targeted endpoint is listening for connections and the HttpClient returns a response, the version with union containers completes in 50ms, while the version without union containers completes in 10ms.
 
-The performance impact of using the `UnionContainers` library is minimal and in most cases, the performance impact will be negligible. The benefits of using the `UnionContainers` library hopefully outweigh the minimal performance impact.
+When the targeted endpoint is not listening for connections and the HttpClient throws an exception, the version with
+union containers completes in 2070ms, while the version without union containers completes in 2040ms.
+When the targeted endpoint is listening for connections and the HttpClient returns a response, the version with union
+containers completes in 50ms, while the version without union containers completes in 10ms.
+
+The performance impact of using the `UnionContainers` library is minimal and in most cases, the performance impact will
+be negligible. The benefits of using the `UnionContainers` library hopefully outweigh the minimal performance impact.
 
 #### Performance Test Vs Other Libraries
-`UnionContainers` uses sealed classes while `OneOf` and `LanguageExt` make use of structs which for simple situations does yield a performance increase. 
+
+`UnionContainers` uses sealed classes while `OneOf` and `LanguageExt` make use of structs which for simple situations
+does yield a performance increase.
+
 ```csharp
 | Method                 | Mean    | Error    | StdDev   | Allocated |
 |----------------------- |--------:|---------:|---------:|----------:|
@@ -1276,14 +1430,20 @@ The performance impact of using the `UnionContainers` library is minimal and in 
 | GetHTTPResponseLangExt | 2.032 s | 0.0063 s | 0.0059 s |   28.3 KB |
 | GetHTTPResponseUnion   | 2.031 s | 0.0099 s | 0.0092 s |  32.05 KB |
 ```
-However, by being based on a class UnionContainers allows for more flexibility and ease of use than the struct-based libraries.
-This includes the ability to convert between container types, to utilize the shared extension methods, and base implementations from the common abstract class.
 
+However, by being based on a class UnionContainers allows for more flexibility and ease of use than the struct-based
+libraries.
+This includes the ability to convert between container types, to utilize the shared extension methods, and base
+implementations from the common abstract class.
 
 ## What are the various projects in the solution?
+
 The `UnionContainers` solution contains the following projects:
+
 - **UnionContainersCore** - The main project that contains the `UnionContainers` library.
 - **DemoApp** - A demo project that shows how to use the `UnionContainers` library.
-- **UnionContainersSourceGenerator** - A source generator that generates strongly typed containers for functions that are wrapped in the `MethodToContainer` method as well as various diagnostics for the `UnionContainers` library.
-- **UnionContainerShared** - A shared project that contains shared code that is used by the `UnionContainersCore` and `UnionContainersSourceGenerator` projects.
+- **UnionContainersSourceGenerator** - A source generator that generates strongly typed containers for functions that
+  are wrapped in the `MethodToContainer` method as well as various diagnostics for the `UnionContainers` library.
+- **UnionContainerShared** - A shared project that contains shared code that is used by the `UnionContainersCore` and
+  `UnionContainersSourceGenerator` projects.
 

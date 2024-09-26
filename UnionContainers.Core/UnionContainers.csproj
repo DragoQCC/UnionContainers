@@ -6,7 +6,8 @@
         <Title>UnionContainers</Title>
         <Authors>DragoQCC</Authors>
         <Description>`UnionContainers` is a library that provides a discriminated union like type in C#.
-It is not a pure copy of a discriminated union, but it is a close approximation with some extras mixed in to make working with this type as painless as possible in existing or new C# projects.</Description>
+            It is not a pure copy of a discriminated union, but it is a close approximation with some extras mixed in to make working with this type as painless as possible in existing or new C# projects.
+        </Description>
         <AssemblyVersion>1.0.0</AssemblyVersion>
         <PackageReadmeFile>Readme.md</PackageReadmeFile>
         <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
@@ -18,39 +19,38 @@ It is not a pure copy of a discriminated union, but it is a close approximation 
         <TargetFrameworks>net8.0;netstandard2.1</TargetFrameworks>
     </PropertyGroup>
     <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
-      <DebugSymbols>true</DebugSymbols>
-      <DebugType>embedded</DebugType>
-      <DocumentationFile>bin\x64\Release\UnionContainers.Core.xml</DocumentationFile>
+        <DebugSymbols>true</DebugSymbols>
+        <DebugType>embedded</DebugType>
+        <DocumentationFile>bin\x64\Release\UnionContainers.Core.xml</DocumentationFile>
     </PropertyGroup>
 
     <ItemGroup>
-      <None Include="..\Readme.md">
-        <Pack>True</Pack>
-        <PackagePath>\</PackagePath>
-      </None>
-      <None Remove="UnionContainers.csproj.DotSettings" />
+        <None Include="..\Readme.md">
+            <Pack>True</Pack>
+            <PackagePath>\</PackagePath>
+        </None>
+        <None Remove="UnionContainers.csproj.DotSettings"/>
     </ItemGroup>
     <!-- Project references -->
     <ItemGroup>
-      <ProjectReference Include="..\UnionContainers.Analyzers\UnionContainers.Analyzers.csproj" ReferenceOutputAssembly="false" />
-      <None Include="..\UnionContainers.Analyzers\bin\$(Configuration)\netstandard2.0\UnionContainers.Analyzers.dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
-      <ProjectReference Include="..\UnionContainers.Shared\UnionContainers.Shared.csproj" PrivateAssets="All" Pack="true" />
+        <ProjectReference Include="..\UnionContainers.Analyzers\UnionContainers.Analyzers.csproj" ReferenceOutputAssembly="false"/>
+        <None Include="..\UnionContainers.Analyzers\bin\$(Configuration)\netstandard2.0\UnionContainers.Analyzers.dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false"/>
+        <ProjectReference Include="..\UnionContainers.Shared\UnionContainers.Shared.csproj" PrivateAssets="All" Pack="true"/>
     </ItemGroup>
 
-    
-    
+
     <!-- Package references -->
     <ItemGroup>
-        <PackageReference Include="HelpfulTypesAndExtensions" Version="1.3.1" PrivateAssets="All" />
-        <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="8.0.1" />
-        <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="8.0.1" />
+        <PackageReference Include="HelpfulTypesAndExtensions" Version="1.3.2" PrivateAssets="All"/>
+        <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="8.0.1"/>
+        <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="8.0.1"/>
         <PackageReference Include="PolySharp" Version="1.14.1">
-          <PrivateAssets>all</PrivateAssets>
-          <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="Teronis.MSBuild.Packaging.ProjectBuildInPackage" Version="1.0.0">
-          <PrivateAssets>all</PrivateAssets>
-          <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        <PackageReference Include="Tenekon.MSBuild.Packaging.ProjectBuildInPackage" Version="2.0.0">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
     </ItemGroup>
 </Project>

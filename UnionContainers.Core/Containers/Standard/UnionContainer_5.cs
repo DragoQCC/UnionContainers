@@ -35,7 +35,7 @@ public sealed record UnionContainer<T1, T2, T3, T4, T5> : UnionContainerBase<Uni
                 break;
         }
     }
-    
+
     public UnionContainer()
     {}
     public UnionContainer(T1 value) : base(value)
@@ -48,9 +48,9 @@ public sealed record UnionContainer<T1, T2, T3, T4, T5> : UnionContainerBase<Uni
     {}
     public UnionContainer(T5 value) : base(value)
     {}
-    
+
     public new static UnionContainer<T1,T2,T3,T4,T5> Create() => new();
-    
+
     // Implicit conversion operators
     public static implicit operator UnionContainer<T1, T2, T3, T4, T5>(T1? value) => new UnionContainer<T1, T2, T3, T4, T5>().SetValue(value);
     public static implicit operator UnionContainer<T1, T2, T3, T4, T5>(T2? value) => new UnionContainer<T1, T2, T3, T4, T5>().SetValue(value);

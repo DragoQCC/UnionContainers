@@ -4,7 +4,7 @@ namespace UnionContainers.Containers.Standard;
 
 public sealed record UnionContainer<T1, T2, T3, T4, T5, T6, T7, T8> : UnionContainerBase<UnionContainer<T1,T2,T3,T4,T5,T6,T7,T8>>, IUnionContainer<UnionContainer<T1,T2,T3,T4,T5,T6,T7,T8>>
 {
-    
+
     //deconstruction method
     public void Deconstruct(out T1? value1, out T2? value2, out T3? value3, out T4? value4, out T5? value5, out T6? value6, out T7? value7, out T8? value8)
     {
@@ -45,7 +45,7 @@ public sealed record UnionContainer<T1, T2, T3, T4, T5, T6, T7, T8> : UnionConta
                 break;
         }
     }
-    
+
     public UnionContainer()
     {}
     public UnionContainer(T1 value) : base(value)
@@ -64,9 +64,9 @@ public sealed record UnionContainer<T1, T2, T3, T4, T5, T6, T7, T8> : UnionConta
     {}
     public UnionContainer(T8 value) : base(value)
     {}
-    
+
     public new static UnionContainer<T1,T2,T3,T4,T5,T6,T7,T8> Create() => new();
-    
+
     // Implicit conversion operators
     public static implicit operator UnionContainer<T1, T2, T3, T4, T5, T6, T7, T8>(T1? value) => new UnionContainer<T1, T2, T3, T4, T5, T6, T7, T8>().SetValue(value);
     public static implicit operator UnionContainer<T1, T2, T3, T4, T5, T6, T7, T8>(T2? value) => new UnionContainer<T1, T2, T3, T4, T5, T6, T7, T8>().SetValue(value);
@@ -77,3 +77,4 @@ public sealed record UnionContainer<T1, T2, T3, T4, T5, T6, T7, T8> : UnionConta
     public static implicit operator UnionContainer<T1, T2, T3, T4, T5, T6, T7, T8>(T7? value) => new UnionContainer<T1, T2, T3, T4, T5, T6, T7, T8>().SetValue(value);
     public static implicit operator UnionContainer<T1, T2, T3, T4, T5, T6, T7, T8>(T8? value) => new UnionContainer<T1, T2, T3, T4, T5, T6, T7, T8>().SetValue(value);
 }*/
+

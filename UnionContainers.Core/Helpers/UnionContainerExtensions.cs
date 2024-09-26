@@ -6,11 +6,14 @@ namespace UnionContainers;
 
 public static class UnionContainerExtensions
 {
-    #region Conversion Extensions
+#region Conversion Extensions
     //Conversion Extensions
-    public static UnionContainer<T> ToContainer<T>(this T? item) => item is null ? UnionContainer<T>.Empty() : new(item);
-    
-    
+    public static UnionContainer<T> ToContainer<T>(this T? item)
+        => item is null
+            ? UnionContainer<T>.Empty()
+            : new UnionContainer<T>(item);
+
+
     /*/// <summary>
     /// Takes in the current container and a target container type <br/>
     /// Returns a container with the same state as the source container but with the target container generic types <br/>
@@ -22,7 +25,7 @@ public static class UnionContainerExtensions
     /// <typeparam name="TContainer"></typeparam>
     /// <typeparam name="TTargetContainer"></typeparam>
     /// <returns></returns>
-    public static TTargetContainer TryConvertContainer<TContainer,TTargetContainer>(this TContainer container) 
+    public static TTargetContainer TryConvertContainer<TContainer,TTargetContainer>(this TContainer container)
         where TContainer : struct, IUnionContainer
         where TTargetContainer : struct, IUnionContainer
     {
@@ -44,76 +47,80 @@ public static class UnionContainerExtensions
         }
         return newContainer;
     }*/
-    
-    #endregion
-   
-    #region State Checking Extensions
+#endregion
+
+#region State Checking Extensions
     //State Checking Extensions
-    
+
     /// <summary>
-    /// returns true if the container has any errors or exceptions set
+    ///     returns true if the container has any errors or exceptions set
     /// </summary>
-    /// <param name="container"></param>
-    /// <typeparam name="TContainer"></typeparam>
-    /// <returns></returns>
-    public static bool MissingResult<TContainer>(this TContainer container) where TContainer : struct, IUnionContainer
+    /// <param name="container"> </param>
+    /// <typeparam name="TContainer"> </typeparam>
+    /// <returns> </returns>
+    public static bool MissingResult<TContainer>(this TContainer container)
+    where TContainer : struct, IUnionContainer
         => container.HasResult() is false;
-    
-    
+
+
     /// <summary>
-    /// Returns `true` if the container is empty, `false` if it has a value
-    /// Also returns false when <see cref="UnionContainerConfiguration.ContainersNotEmptyIfIssues"/> is set to true and the container has issues (i.e. an error or exception)
+    ///     Returns `true` if the container is empty, `false` if it has a value
+    ///     Also returns false when <see cref="UnionContainerConfiguration.ContainersNotEmptyIfIssues"/> is set to true and the container has issues (i.e. an error or exception)
     /// </summary>
-    /// <param name="container"></param>
-    /// <typeparam name="TContainer"></typeparam>
-    /// <returns></returns>
-    public static bool IsEmpty<TContainer>(this TContainer container) where TContainer : struct, IUnionContainer
-        => UnionContainerConfiguration.UnionContainerOptionsInternal.ContainersNotEmptyIfIssues 
-            ? container.HasErrors() 
+    /// <param name="container"> </param>
+    /// <typeparam name="TContainer"> </typeparam>
+    /// <returns> </returns>
+    public static bool IsEmpty<TContainer>(this TContainer container)
+    where TContainer : struct, IUnionContainer
+        => UnionContainerConfiguration.UnionContainerOptionsInternal.ContainersNotEmptyIfIssues
+            ? container.HasErrors()
             : container.State is UnionContainerState.Empty;
-    
+
     /// <summary>
-    /// Returns `true` if the container has an error, `false` if it does not
-    /// A container has an error once the <see cref="UnionContainerBase{TContainer}.AddError{TError}"/> method has been called
+    ///     Returns `true` if the container has an error, `false` if it does not
+    ///     A container has an error once the <see cref="UnionContainerBase{TContainer}.AddError{TError}"/> method has been called
     /// </summary>
-    /// <param name="container"></param>
-    /// <typeparam name="TContainer"></typeparam>
-    /// <returns></returns>
-    public static bool HasErrors<TContainer>(this TContainer container) where TContainer : struct, IUnionContainer
+    /// <param name="container"> </param>
+    /// <typeparam name="TContainer"> </typeparam>
+    /// <returns> </returns>
+    public static bool HasErrors<TContainer>(this TContainer container)
+    where TContainer : struct, IUnionContainer
         => container.State is UnionContainerState.Error;
-    
-    
+
+
     /// <summary>
-    /// Returns true if the container has a value set, false otherwise
+    ///     Returns true if the container has a value set, false otherwise
     /// </summary>
-    /// <param name="container"></param>
-    /// <typeparam name="TContainer"></typeparam>
-    /// <returns></returns>
-    public static bool HasResult<TContainer>(this TContainer container) where TContainer : struct, IUnionContainer
+    /// <param name="container"> </param>
+    /// <typeparam name="TContainer"> </typeparam>
+    /// <returns> </returns>
+    public static bool HasResult<TContainer>(this TContainer container)
+    where TContainer : struct, IUnionContainer
         => container.State is UnionContainerState.Result;
-    
-    public static UnionContainerState GetState<TContainer>(this TContainer container) where TContainer : IUnionContainer //struct, IUnionContainer
+
+    public static UnionContainerState GetState<TContainer>(this TContainer container)
+    where TContainer : IUnionContainer //struct, IUnionContainer
         => container.State;
-    
-    #endregion
-    
-    #region State Handle Extensions
+#endregion
+
+#region State Handle Extensions
     //State Handling Extensions
-    
+
     /// <summary>
-    /// Executes the supplied action if the container is still empty <br/>
-    /// Container is empty if it has no value, error or exception set <br/>
-    /// Throws an exception if the action throws an exception and <see cref="UnionContainerOptions.ThrowExceptionsFromUserHandlingCode"/> is set to true <br/>
+    ///     Executes the supplied action if the container is still empty <br/>
+    ///     Container is empty if it has no value, error or exception set <br/>
+    ///     Throws an exception if the action throws an exception and <see cref="UnionContainerOptions.ThrowExceptionsFromUserHandlingCode"/> is set to true <br/>
     /// </summary>
-    /// <param name="container"></param>
-    /// <param name="action"></param>
-    /// <typeparam name="TContainer"></typeparam>
-    /// <returns>The original container instance so method calls can be chained</returns>
-    public static TContainer IfEmptyDo<TContainer>(this ref TContainer container, Action action) where TContainer : struct, IUnionContainer
+    /// <param name="container"> </param>
+    /// <param name="action"> </param>
+    /// <typeparam name="TContainer"> </typeparam>
+    /// <returns> The original container instance so method calls can be chained </returns>
+    public static TContainer IfEmptyDo<TContainer>(this ref TContainer container, Action action)
+    where TContainer : struct, IUnionContainer
     {
         try
         {
-            if(container.IsEmpty())
+            if (container.IsEmpty())
             {
                 container.IfNotNullDo(action).ContinueWith(container);
             }
@@ -122,36 +129,40 @@ public static class UnionContainerExtensions
         {
             if (UnionContainerConfiguration.UnionContainerOptionsInternal.LoggingOptions.ContainerErrorHandlingLogging.Log)
             {
-                var logLevel = UnionContainerConfiguration.UnionContainerOptionsInternal.LoggingOptions.ContainerErrorHandlingLogging.LogLevel;
+                LogLevel logLevel = UnionContainerConfiguration.UnionContainerOptionsInternal.LoggingOptions.ContainerErrorHandlingLogging.LogLevel;
                 UnionContainerConfiguration.UnionContainerOptionsInternal.LoggingOptions.Logger.Log(logLevel, "Exception while trying to handle empty state {Exception}", e);
             }
+
             if (UnionContainerConfiguration.UnionContainerOptionsInternal.TreatExceptionsAsErrors)
             {
                 container.AddError("Error while trying to handle empty state, " + e);
             }
-            if(UnionContainerConfiguration.UnionContainerOptionsInternal.ThrowExceptionsFromUserHandlingCode)
+
+            if (UnionContainerConfiguration.UnionContainerOptionsInternal.ThrowExceptionsFromUserHandlingCode)
             {
                 throw;
             }
         }
+
         return container;
     }
-    
-    
+
+
     /// <summary>
-    /// Executes the supplied action if the container has an exception set
-    /// Throws an exception if the action throws an exception and <see cref="UnionContainerOptions.ThrowExceptionsFromUserHandlingCode"/> is set to true <br/>
+    ///     Executes the supplied action if the container has an exception set
+    ///     Throws an exception if the action throws an exception and <see cref="UnionContainerOptions.ThrowExceptionsFromUserHandlingCode"/> is set to true <br/>
     /// </summary>
-    /// <param name="container"></param>
-    /// <param name="action"></param>
-    /// <typeparam name="TContainer"></typeparam>
-    /// <returns></returns>
-    public static TContainer IfExceptionDo<TContainer>(this ref TContainer container, Action<Exception> action) where TContainer : struct, IUnionContainer
+    /// <param name="container"> </param>
+    /// <param name="action"> </param>
+    /// <typeparam name="TContainer"> </typeparam>
+    /// <returns> </returns>
+    public static TContainer IfExceptionDo<TContainer>(this ref TContainer container, Action<Exception> action)
+    where TContainer : struct, IUnionContainer
     {
         try
         {
             Exception? ex = container.GetException();
-            if(ex is not null)
+            if (ex is not null)
             {
                 action(ex);
             }
@@ -160,139 +171,166 @@ public static class UnionContainerExtensions
         {
             if (UnionContainerConfiguration.UnionContainerOptionsInternal.LoggingOptions.ContainerExceptionHandlingLogging.Log)
             {
-                var logLevel = UnionContainerConfiguration.UnionContainerOptionsInternal.LoggingOptions.ContainerExceptionHandlingLogging.LogLevel;
-                UnionContainerConfiguration.UnionContainerOptionsInternal.LoggingOptions.Logger.Log(logLevel, "Exception produced while handling containers exception value {Exception}", e);
+                LogLevel logLevel = UnionContainerConfiguration.UnionContainerOptionsInternal.LoggingOptions.ContainerExceptionHandlingLogging.LogLevel;
+                UnionContainerConfiguration.UnionContainerOptionsInternal.LoggingOptions.Logger.Log
+                    (logLevel, "Exception produced while handling containers exception value {Exception}", e);
             }
+
             if (UnionContainerConfiguration.UnionContainerOptionsInternal.TreatExceptionsAsErrors)
             {
                 container.AddError("Error while trying to handle exception state, " + e);
             }
-            if(UnionContainerConfiguration.UnionContainerOptionsInternal.ThrowExceptionsFromUserHandlingCode)
+
+            if (UnionContainerConfiguration.UnionContainerOptionsInternal.ThrowExceptionsFromUserHandlingCode)
             {
                 throw;
             }
         }
+
         return container;
     }
-    
-    #endregion
+#endregion
 
-    
-    #region Data Access Extensions
+
+#region Data Access Extensions
     //Data Access Extensions
     /// <summary>
-    /// Returns the exception of the container if one is set, otherwise returns null
+    ///     Returns the exception of the container if one is set, otherwise returns null
     /// </summary>
-    /// <param name="container"></param>
-    /// <typeparam name="TContainer"></typeparam>
-    /// <returns></returns>
-    public static Exception? GetException<TContainer>(this TContainer container) where TContainer : IUnionContainer
+    /// <param name="container"> </param>
+    /// <typeparam name="TContainer"> </typeparam>
+    /// <returns> </returns>
+    public static Exception? GetException<TContainer>(this TContainer container)
+    where TContainer : IUnionContainer
         => container.State switch
         {
             UnionContainerState.Error => container.GetErrors<CustomErrors.ExceptionWrapperError>().FirstOrDefault().exception.ReturnIf(x => x.IsNotDefault()),
             _ => null
         };
 
-    
-    
-    
-    public static void AddError<TContainer>(this ref TContainer container, IError error) where TContainer : struct, IUnionContainer
+
+
+
+    public static void AddError<TContainer>(this ref TContainer container, IError error)
+    where TContainer : struct, IUnionContainer
     {
-        container.Errors ??= [];
+        container.Errors ??= [ ];
         container.Errors.Add(error);
-        if(container.State != UnionContainerState.Error)
+        if (container.State != UnionContainerState.Error)
         {
             container.State = UnionContainerState.Error;
         }
     }
-    
-    public static void AddError<TContainer,TError>(this ref TContainer container, TError error) where TContainer : struct, IUnionContainer where TError : IError
-     => container.AddError((IError)error);
-    
-    public static void AddError<TContainer>(this ref TContainer container, string message) where TContainer : struct, IUnionContainer
+
+    public static void AddError<TContainer, TError>(this ref TContainer container, TError error)
+    where TContainer : struct, IUnionContainer
+    where TError : IError
+        => container.AddError((IError)error);
+
+    public static void AddError<TContainer>(this ref TContainer container, string message)
+    where TContainer : struct, IUnionContainer
         => container.AddError(CustomErrors.Generic(message));
-    
-    public static void AddError<TContainer>(this ref TContainer container, Exception ex) where TContainer : struct, IUnionContainer
+
+    public static void AddError<TContainer>(this ref TContainer container, Exception ex)
+    where TContainer : struct, IUnionContainer
         => container.AddError(CustomErrors.Exception(ex));
-    
-   
-    
-    public static void AddErrors<TContainer>(this ref TContainer container, params IError[] errors) where TContainer : struct, IUnionContainer
+
+
+
+    public static void AddErrors<TContainer>(this ref TContainer container, params IError[] errors)
+    where TContainer : struct, IUnionContainer
         => container.AddErrors(errors);
 
     public static void AddErrors<TContainer>(this ref TContainer container, params string[] messages)
-        where TContainer : struct, IUnionContainer
+    where TContainer : struct, IUnionContainer
     {
-        foreach (var message in messages)
+        foreach (string message in messages)
         {
             container.AddError(message);
         }
     }
 
     public static void AddErrors<TContainer, TError>(this ref TContainer container, params TError[] errors)
-        where TContainer : struct, IUnionContainer where TError : struct, IError
+    where TContainer : struct, IUnionContainer
+    where TError : struct, IError
     {
-        foreach (var error in errors)
+        foreach (TError error in errors)
         {
-           container.AddError(error); 
+            container.AddError(error);
         }
     }
 
     public static void AddErrors<TContainer>(this ref TContainer container, params Exception[] exceptions)
-        where TContainer : struct, IUnionContainer
+    where TContainer : struct, IUnionContainer
     {
-        foreach (var e in exceptions)
+        foreach (Exception e in exceptions)
         {
             container.AddError(e);
         }
     }
-    
-    
-    
-    public static List<IError> GetErrors<TContainer>(this  TContainer container) where TContainer : IUnionContainer//struct, IUnionContainer
+
+
+
+    public static List<IError> GetErrors<TContainer>(this TContainer container)
+    where TContainer : IUnionContainer //struct, IUnionContainer
         => container.GetErrors();
-    
-    public static List<TError> GetErrors<TError>(this IUnionContainer container)  where TError : struct, IError
+
+    public static List<TError> GetErrors<TError>(this IUnionContainer container)
+    where TError : struct, IError
         => container.GetErrors<TError>();
-    
-    
-    
-    internal static TContainer TryCreateResult<TContainer,TValueTuple>(this ref TContainer container, TValueTuple value) where TContainer : struct, IUnionResultContainer<TValueTuple> where TValueTuple : struct, ITuple
+
+
+
+    internal static TContainer TryCreateResult<TContainer, TValueTuple>(this ref TContainer container, TValueTuple value)
+    where TContainer : struct, IUnionResultContainer<TValueTuple>
+    where TValueTuple : struct, ITuple
     {
         if (container.State != UnionContainerState.Empty)
         {
             return container;
         }
+
         for (int i = 0; i < value.Length; i++)
         {
             if (value[i] is not null)
             {
-                container = container with { ResultValue = value, State = UnionContainerState.Result };
+                container = container with
+                {
+                    ResultValue = value,
+                    State = UnionContainerState.Result
+                };
+
                 break;
             }
         }
+
         return container;
     }
-    
-    public static void Match<TContainer,TValueTuple>(this TContainer container, Action<Exception>? catchHandler = null, params Delegate[] actions) where TContainer: IUnionResultContainer<TValueTuple> where TValueTuple : struct,ITuple
+
+    public static void Match<TContainer, TValueTuple>(this TContainer container, Action<Exception>? catchHandler = null, params Delegate[] actions)
+    where TContainer : IUnionResultContainer<TValueTuple>
+    where TValueTuple : struct, ITuple
     {
         if (container.State != UnionContainerState.Result)
         {
             return;
         }
+
         for (int i = 0; i < container.ResultValue.Length; i++)
         {
             if (container.ResultValue[i] is null)
             {
                 continue;
             }
+
             try
             {
-                var result = container.ResultValue[i];
+                object? result = container.ResultValue[i];
                 if (result.GetType() == actions[i].Method.GetParameters()[0].ParameterType)
                 {
                     actions[i].DynamicInvoke(result);
                 }
+
                 break;
             }
             catch (Exception e)
@@ -301,7 +339,7 @@ public static class UnionContainerExtensions
             }
         }
     }
-    
+
     /*internal static void LogMethodToContainerException<TContainer>(this TContainer container,Exception e) where TContainer : UnionContainerBase<TContainer>,IUnionContainer<TContainer>
     {
         if (UnionContainerConfiguration.UnionContainerOptionsInternal.LoggingOptions.ContainerCreationLogging.Log)
@@ -318,6 +356,5 @@ public static class UnionContainerExtensions
             container.SetException(e);
         }
     }*/
-    
-    #endregion
+#endregion
 }

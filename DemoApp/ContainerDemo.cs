@@ -1,10 +1,11 @@
-﻿/*using DemoApp.ContainerCreationExamples;
+﻿using System.Text;
+using DemoApp.Common;
+using DemoApp.ContainerCreationExamples;
 using DemoApp.ContainerResultMatchExamples;
-using UnionContainers.Containers.Standard;
-using UnionContainers.Helpers;
-
-using static DemoApp.Program;
+using MethodTimer;
+using UnionContainers;
 using static DemoApp.Common.ConsoleMessageHelpers;
+using static DemoApp.Program;
 
 namespace DemoApp;
 
@@ -12,12 +13,14 @@ public class ContainerDemo(UnionContainerConfiguration containerConfiguration)
 {
     public async Task Run()
     {
-        Console.OutputEncoding = System.Text.Encoding.UTF8;
+        Console.OutputEncoding = Encoding.UTF8;
         Console.WriteLine("-------------------------Union Container Demo-----------------------------------");
         Console.WriteLine($"{Info()} UnionContainerConfiguration.DefaultAsNull: {containerConfiguration.UnionContainerOptions.DefaultAsNull}");
         Console.WriteLine($"{Info()} UnionContainerConfiguration.ContainerEmptyIfIssues: {containerConfiguration.UnionContainerOptions.ContainersNotEmptyIfIssues}");
         Console.WriteLine($"{Info()} UnionContainerConfiguration.TreatExceptionsAsErrors: {containerConfiguration.UnionContainerOptions.TreatExceptionsAsErrors}");
-        Console.WriteLine($"{Info()} UnionContainerConfiguration.ThrowExceptionsFromUserHandlingCode: {containerConfiguration.UnionContainerOptions.ThrowExceptionsFromUserHandlingCode}");
+        Console.WriteLine
+            ($"{Info()} UnionContainerConfiguration.ThrowExceptionsFromUserHandlingCode: {containerConfiguration.UnionContainerOptions.ThrowExceptionsFromUserHandlingCode}");
+
         Console.WriteLine();
         Console.WriteLine("--------------------------------------------------------------------------------");
         Console.WriteLine();
@@ -25,18 +28,19 @@ public class ContainerDemo(UnionContainerConfiguration containerConfiguration)
         try
         {
             ContainerHelloWorldIntro();
-            /*Console.WriteLine();
+            Console.WriteLine();
             BasicMatchExample();
             Console.WriteLine();
             BasicNonContainerMatchExample();
             Console.WriteLine();
-            ContainerDefaultAsNullDemo(containerConfiguration);#1#
+            ContainerDefaultAsNullDemo(containerConfiguration);
             Console.WriteLine();
         }
         catch (Exception e)
         {
             Console.WriteLine(e);
         }
+
         Console.WriteLine("--------------------------------------------------------------------------------");
         Console.WriteLine();
         Console.WriteLine("------------------Explicit Container Creation Examples--------------------------");
@@ -66,23 +70,23 @@ public class ContainerDemo(UnionContainerConfiguration containerConfiguration)
         {
             Console.WriteLine(e);
         }
-        
+
         Console.WriteLine("Example of a container being used to wrap unsafe methods such as divide by zero");
-        var divideByZeroResuiult1 = ExplicitContainerCreation.DivideByZeroTestContainer();
-        divideByZeroResuiult1.Match((int value) => Console.WriteLine("Result of divide by zero: " + value));
+        UnionContainer<int> divideByZeroResuiult1 = ExplicitContainerCreation.DivideByZeroTestContainer();
+        divideByZeroResuiult1.Match(value => Console.WriteLine("Result of divide by zero: " + value));
         divideByZeroResuiult1.IfExceptionDo(ex => Console.WriteLine("Exception occurred: " + ex.Message));
         try
         {
             Console.WriteLine();
             Console.WriteLine("Example of just a try-catch being used to handle divide by zero");
-            var divideByZeroResult2 = ExplicitContainerCreation.DivideByZeroTest();
+            int divideByZeroResult2 = ExplicitContainerCreation.DivideByZeroTest();
             Console.WriteLine("Result of divide by zero: " + divideByZeroResult2);
         }
         catch (Exception e)
         {
             Console.WriteLine("Exception occurred: " + e.Message);
         }
-        
+
         Console.WriteLine("--------------------------------------------------------------------------------");
         Console.WriteLine();
         Console.WriteLine("------------------Implicit Container Creation Examples--------------------------");
@@ -95,6 +99,7 @@ public class ContainerDemo(UnionContainerConfiguration containerConfiguration)
         {
             Console.WriteLine(e);
         }
+
         Console.WriteLine("--------------------------------------------------------------------------------");
         Console.WriteLine();
         Console.WriteLine("------------------Container Issue Checking Examples-----------------------------");
@@ -110,6 +115,7 @@ public class ContainerDemo(UnionContainerConfiguration containerConfiguration)
         {
             Console.WriteLine(e);
         }
+
         try
         {
             IssuesMatch.AddErrorsAndGetExample2();
@@ -119,6 +125,7 @@ public class ContainerDemo(UnionContainerConfiguration containerConfiguration)
             Console.WriteLine(e);
             throw;
         }
+
         Console.WriteLine("--------------------------------------------------------------------------------");
         Console.WriteLine();
         Console.WriteLine("------------------Container Result Match Examples-------------------------------");
@@ -136,6 +143,7 @@ public class ContainerDemo(UnionContainerConfiguration containerConfiguration)
         {
             Console.WriteLine(e);
         }
+
         Console.WriteLine("--------------------------------------------------------------------------------");
         Console.WriteLine();
         Console.WriteLine("------------------Container Result Match and Extract Examples------------------");
@@ -153,51 +161,50 @@ public class ContainerDemo(UnionContainerConfiguration containerConfiguration)
         {
             Console.WriteLine(e);
         }
+
         Console.WriteLine("--------------------------------------------------------------------------------");
         Console.WriteLine();
     }
-    
-    
-    
-    
-    /*[Time("Basic Union Container match example that errors")]
+
+
+
+
+    [Time("Basic Union Container match example that errors")]
     private void BasicMatchExample()
-    {
-        TryGetEmployeeByNameIdOrGuid("Bob Stevens")
-            .MatchResult((Employee resultItem) =>
-            {
-                Console.WriteLine("Container has a result");
-                Console.WriteLine($"Employee found: {resultItem.Name}");
-            })
-            .IfEmptyDo(() =>
-            {
-                Console.WriteLine("no user, Container is empty");
-            })
-            .IfErrorDo<string>(errorValues =>
-            {
-                Console.WriteLine("Error occurred while getting employee");
-                Console.WriteLine("Error values:");
-                foreach (var errorValue in errorValues)
+        => TryGetEmployeeByNameIdOrGuid("Bob Stevens")
+            .MatchResult
+            (
+                (Programmer resultItem) =>
                 {
-                    Console.WriteLine("\t" + errorValue);
+                    Console.WriteLine("Container has a result");
+                    Console.WriteLine($"Employee found: {resultItem.Name}");
                 }
-            })
-            .IfExceptionDo(ex =>
-            {
-                Console.WriteLine("Exception occurred: " + ex.Message);
-            });
-    }
-    
+            )
+            .IfEmptyDo(() => { Console.WriteLine("no user, Container is empty"); })
+            .IfErrorDo<string>
+            (
+                errorValues =>
+                {
+                    Console.WriteLine("Error occurred while getting employee");
+                    Console.WriteLine("Error values:");
+                    foreach (var errorValue in errorValues)
+                    {
+                        Console.WriteLine("\t" + errorValue);
+                    }
+                }
+            )
+            .IfExceptionDo(ex => { Console.WriteLine("Exception occurred: " + ex.Message); });
+
     [Time("Basic Example Without Union Container")]
     private void BasicNonContainerMatchExample()
     {
         try
         {
-            var employee = TryGetEmployeeByNameOrIdWithoutContainers("Bob Stevens");
+            Programmer? employee = TryGetEmployeeByNameOrIdWithoutContainers("Bob Stevens");
             if (employee != null)
             {
                 Console.WriteLine("Employee found: " + employee.Name);
-                if(employee.Name == "Bob Stevens")
+                if (employee.Name == "Bob Stevens")
                 {
                     Console.WriteLine("Bob stevens is on vacation");
                 }
@@ -211,12 +218,12 @@ public class ContainerDemo(UnionContainerConfiguration containerConfiguration)
         {
             Console.WriteLine("Exception occurred: " + e.Message);
         }
-    }#1#
+    }
 
-    /*private static void ContainerDefaultAsNullDemo(UnionContainerConfiguration containerConfiguration)
+    private static void ContainerDefaultAsNullDemo(UnionContainerConfiguration containerConfiguration)
     {
         Console.WriteLine($"{Info()} Showcase of UnionContainerConfiguration.DefaultAsNull being set to {containerConfiguration.UnionContainerOptions.DefaultAsNull}");
-        UnionContainers.Containers.Standard.UnionContainer<string,int> container2 = new();
+        UnionContainer<string, int> container2 = new();
         Console.WriteLine($"{Info()} Setting Container Value to the default value of the type");
         if (containerConfiguration.UnionContainerOptions.DefaultAsNull)
         {
@@ -230,9 +237,10 @@ public class ContainerDemo(UnionContainerConfiguration containerConfiguration)
             Console.WriteLine($"{Info()} When Default is treated like a value the container will handle the result as it is not null");
             container2.MatchResult((int value) => Console.WriteLine("Container value is: " + value)); // executes
         }
+
         container2.SetValue(5);
         container2.MatchResult((int value) => Console.WriteLine("Container value is: " + value));
-    }#1#
+    }
 
     private static void ContainerHelloWorldIntro()
     {
@@ -241,20 +249,25 @@ public class ContainerDemo(UnionContainerConfiguration containerConfiguration)
         UnionContainer<string> container = "Hello World";
         Console.WriteLine($"{Success()} UnionContainer created with a string value");
         Console.WriteLine($"{Caution()} Once a container is made with a specific type it can only be assigned values of that type or derived types");
-        
+
         //Produces error UNCT001, a container cannot be assigned a type that is not in the container / a derived type
         Console.WriteLine($"{Error()} Uncomment the below line to see the build/design time error produced when trying to assign a value of a different type to the container");
         //container.SetValue(7.5);
         Console.WriteLine($"{Info()} When working with a container the MatchResult method can be used to handle the result of the container");
-        Console.WriteLine($"{Info()} TryHandleMethod supports handling the result of the container with a Action, Func, or Task, it also supports passing in methods to handle exceptions & fallback values when a Func or value returning Task is used");
+        Console.WriteLine
+        (
+            $"{Info()} TryHandleMethod supports handling the result of the container with a Action, Func, or Task, it also supports passing in methods to handle exceptions & fallback values when a Func or value returning Task is used"
+        );
+
         Console.WriteLine($"{Success()} In this example a simple Action/Lambda calling Console.WriteLine was passed in to handle the result of the container");
-        container.Match((string value) => Console.WriteLine("\t The value of the container is: " + value));
-        
+        container.Match(value => Console.WriteLine("\t The value of the container is: " + value));
+
         Console.WriteLine($"{Info()} On a single type container the TryGetValue method can be used to get the value of the container");
         //string? containerValue = container.TryGetValue();
         //Console.WriteLine($"Container value: {containerValue}");
         Console.WriteLine();
         Console.WriteLine($"{Caution()} It is possible that the container does not hold a value which will cause the method to return null");
-        Console.WriteLine($"{Info()} It is safer to use the MatchResult method as it will ignore the result if it is null, meaning your passed in method will never receive a null value");
+        Console.WriteLine
+            ($"{Info()} It is safer to use the MatchResult method as it will ignore the result if it is null, meaning your passed in method will never receive a null value");
     }
-}*/
+}
