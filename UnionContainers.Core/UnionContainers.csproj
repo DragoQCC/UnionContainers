@@ -1,0 +1,49 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <LangVersion>12</LangVersion>
+        <Title>UnionContainers</Title>
+        <Authors>DragoQCC</Authors>
+        <Description>`UnionContainers` is a library that provides a discriminated union like type in C#.
+            It is not a pure copy of a discriminated union, but it is a close approximation with some extras mixed in to make working with this type as painless as possible in existing or new C# projects.
+        </Description>
+        <AssemblyVersion>1.0.0</AssemblyVersion>
+        <PackageReadmeFile>Readme.md</PackageReadmeFile>
+        <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+        <Configurations>Debug;Release</Configurations>
+        <Platforms>AnyCPU;x64</Platforms>
+        <PackageProjectUrl>https://github.com/DragoQCC/UnionContainers</PackageProjectUrl>
+        <PackageLicenseUrl>https://github.com/DragoQCC/UnionContainers/blob/main/LICENSE</PackageLicenseUrl>
+        <RepositoryUrl>https://github.com/DragoQCC/UnionContainers</RepositoryUrl>
+        <TargetFrameworks>net8.0;netstandard2.1;net9.0</TargetFrameworks>
+    </PropertyGroup>
+    <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+        <DebugSymbols>true</DebugSymbols>
+        <DebugType>embedded</DebugType>
+        <DocumentationFile>bin\x64\Release\UnionContainers.Core.xml</DocumentationFile>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <None Include="..\Readme.md">
+            <Pack>True</Pack>
+            <PackagePath>\</PackagePath>
+        </None>
+        <None Remove="UnionContainers.csproj.DotSettings"/>
+    </ItemGroup>
+
+    <!-- Package references -->
+    <ItemGroup>
+        <PackageReference Include="HelpfulTypesAndExtensions" Version="1.4.0" PrivateAssets="All" />
+        <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="8.0.2" />
+        <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="8.0.2" />
+        <PackageReference Include="PolySharp" Version="1.14.1">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
+        <PackageReference Include="Tenekon.MSBuild.Packaging.ProjectBuildInPackage" Version="2.0.0">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
+    </ItemGroup>
+</Project>
