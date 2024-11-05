@@ -1,0 +1,18 @@
+﻿<Solution>
+  <Configurations>
+    <Platform Name="Any CPU" />
+    <Platform Name="x64" />
+  </Configurations>
+  <Folder Name="/SolutionItems/">
+    <File Path="README.md" />
+    <File Path=".github\workflows\publish.yml" />
+  </Folder>
+  <Project Path="DemoApp\DemoApp.csproj" Type="Classic C#" />
+  <Project Path="UnionContainers.Benchmarks\UnionContainers.Benchmarks.csproj" Type="Classic C#">
+    <Configuration Solution="Release|x64" Project="Release|Any CPU" />
+  </Project>
+  <Project Path="UnionContainers.Core\UnionContainers.csproj" />
+  <Project Path="UnionContainers.Tests.Unit\UnionContainers.Tests.Unit.csproj" Type="Classic C#">
+    <Configuration Solution="Release|x64" Project="Release|Any CPU" />
+  </Project>
+</Solution>
