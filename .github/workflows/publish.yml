@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: ./UnionContainers
+        working-directory: ./UnionContainers.Core
     permissions:
       contents: read  # Optional, defaults to read
       packages: write  # Grants write permission to packages
@@ -21,7 +21,7 @@ jobs:
       - name: Setup .NET SDK
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: '8.0.x'  # Specify your .NET SDK version
+          dotnet-version: '9.0.x'  # Specify your .NET SDK version
 
       - name: Restore dependencies
         run: dotnet restore
