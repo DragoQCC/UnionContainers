@@ -119,6 +119,7 @@ This example showcases some of the strengths of the UnionContainers library
 - [License](#license)
 
 
+
 ## Features & Benefits
 - Replace performance heavy exception throwing with a more controlled & faster error handling mechanism.
 - Avoid null reference exceptions by using the Empty state.
